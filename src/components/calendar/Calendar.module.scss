@@ -1,0 +1,242 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 20px;
+  .tableHeaderTitle {
+    border: 1px solid $border-color-v1;
+    th {
+      border: 1px solid $border-color-v1;
+    }
+  }
+}
+
+.week {
+  display: grid;
+  width: 100%;
+  font-size: 12px;
+  box-shadow: $primary-box-shadow;
+  position: relative;
+  width: "100%";
+}
+
+.weekTitle {
+  display: grid;
+  border: 1px solid black;
+  width: 100%;
+}
+.userSidebar {
+  min-width: 200px;
+  box-shadow: $primary-box-shadow;
+  min-height: 100%;
+  p {
+    text-transform: rotate(-90deg);
+    margin: 0;
+    padding: 0;
+    font-weight: bold;
+  }
+}
+
+.day {
+  position: relative;
+  border: 1px solid black;
+}
+
+.calendarWeekHeader {
+  background-color: $primary-white;
+  th {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid $border-color-v1;
+    font-weight: 100;
+  }
+}
+
+.sidebarTimeSlots {
+  @include center;
+  border-left: 1px solid $border-color-v1;
+  background-color: $sidebar-timeslot-bg-color;
+  position: relative;
+
+  width: 40px;
+  &:nth-child(odd) {
+    border-top: 1px solid $border-color-v1;
+  }
+}
+
+.userTableRow {
+  border: 1px solid $border-color-v1;
+  .sidebarUser {
+    @include center;
+    height: 100%;
+    width: 150px;
+    margin: 10px 10px;
+  }
+  &:nth-child(odd) {
+    background-color: $primary-white;
+  }
+}
+
+.hours {
+  height: 20px;
+  font-size: 10px;
+  position: relative;
+  &:nth-child(odd) {
+    border-top: 1px solid $border-color-v1;
+  }
+  &:nth-child(odd) {
+    border-bottom: 1px solid $border-color-v2;
+  }
+  &:hover {
+    background-color: $table-background-hover-color;
+    cursor: pointer;
+  }
+}
+
+.header {
+  border: 1px solid $border-color-v1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  .headerRight {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    button:first-child {
+      margin-right: 20px;
+    }
+  }
+  .headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .headerTitle {
+    font-weight: bold;
+    font-size: 16px;
+  }
+}
+
+.events {
+  position: absolute;
+  border-radius: 5;
+  padding: 4px;
+  font-size: 12;
+  cursor: grab;
+  user-select: none;
+  color: #1a202c;
+  font-weight: bold;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  .eventNote {
+    position: absolute;
+    width: 17px;
+    height: 16px;
+
+    top: 0;
+    right: 0;
+    font-size: 15px;
+    color: red;
+    cursor: pointer;
+  }
+}
+
+.activeEvent {
+  box-shadow: $primary-box-shadow;
+  z-index: 999;
+}
+
+.wrapper {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  font-family: "Segoe UI", Roboto, sans-serif;
+  color: #333;
+
+  .header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+    border-radius: 5px;
+    .color {
+      position: absolute;
+      width: 5px;
+      height: 100%;
+      left: 0;
+      top: 0px;
+      bottom: 0px;
+    }
+    .title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #222;
+      margin: 0;
+      margin-left: 5px;
+    }
+  }
+
+  .detailRow {
+    display: flex;
+
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.95rem;
+
+    &:last-child {
+      border-bottom: none;
+    }
+    .label {
+      width: 70px;
+      font-weight: 500;
+      color: #666;
+    }
+
+    .value {
+      color: #000;
+      max-width: 100%;
+      margin-left: 10px;
+    }
+  }
+
+  .buttonRow {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .editButton {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: $button-padding;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+    &:hover {
+      background-color: #e0e0e0;
+    }
+  }
+
+  .deleteButton {
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    padding: $button-padding;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+    &:hover {
+      background-color: #d9363e;
+    }
+  }
+}
