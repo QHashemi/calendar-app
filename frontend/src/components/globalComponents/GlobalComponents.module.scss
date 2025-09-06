@@ -1,0 +1,27 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.globalPopover {
+  position: absolute;
+  z-index: 10;
+  background-color: white;
+  box-shadow: $shadow-base;
+  padding: 10px;
+  border-radius: 8;
+  min-width: 300px;
+  max-width: 300px;
+  max-height: 500px;
+  overflow-y: auto;
+  transition: opacity 0.2s ease;
+  .popoverHeader {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+
+    .closeBtn {
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #555;
+    }
+  }
+}
