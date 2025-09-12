@@ -14,6 +14,7 @@ let initialState: InitialState = {
 
 // Get events thunk
 export const get_event = createAsyncThunk("event/getEvent", async ({ axiosInstance, componentType }: AsyncThunkResponseType, { rejectWithValue }) => {
+
   try {
     const response = await axiosInstance.get("events");
     return { ...response.data, componentType };

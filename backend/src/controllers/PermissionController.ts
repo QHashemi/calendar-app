@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../db/data-source";
-import { Role } from "../db/models/RoleModel";
 import { Permission } from "../db/models/PermissionModel";
 import { User } from "../db/models/UserModel";
 

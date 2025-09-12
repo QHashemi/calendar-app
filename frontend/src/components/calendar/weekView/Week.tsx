@@ -28,6 +28,8 @@ import { AppDispatch } from "@/Api/store";
 import useAxiosPrivate from "@/Api/useAxiosPrivate";
 import EditEventForm from "./EditEventForm";
 import UserHeader from "./UserHeader";
+import { selectCredentialState } from "@/Api/slices/CredentialsSlice";
+import { can } from "@/helpers/policy";
 
 dayjs.locale("de");
 dayjs.extend(isoWeek);
@@ -40,10 +42,10 @@ type Props = {
 function Week({ daysOfWeek }: Props) {
   const dispatch = useDispatch<AppDispatch>();
   const axiosInstance = useAxiosPrivate();
-
+  const { user } = useSelector(selectCredentialState);
   // Redux selectors
   const users = useSelector(selectUsers);
-  const filteredUser = users.filter((user)=>user.has_personal_calendar)
+  const filteredUser = users.filter((user) => user.has_personal_calendar);
   const eventsData = useSelector(selectEvents);
 
   // States
@@ -51,8 +53,12 @@ function Week({ daysOfWeek }: Props) {
   const [draggingEvent, setDraggingEvent] = useState<DraggingEvent>(null);
   const [resizingEvent, setResizingEvent] = useState<ResizingEvent>(null);
   const [activeEventId, setActiveEventId] = useState<number | null>(null);
-  const [popoverContent, setPopoverContent] = useState<React.ReactNode | null>(null);
-  const [modalContent, setModalContent] = useState<React.ReactNode | null>(null);
+  const [popoverContent, setPopoverContent] = useState<React.ReactNode | null>(
+    null
+  );
+  const [modalContent, setModalContent] = useState<React.ReactNode | null>(
+    null
+  );
   const latestEventRef = useRef<EventType | null>(null);
   const [clientX, setClientX] = useState<number>(0);
   const [clientY, setClientY] = useState<number>(0);
@@ -66,7 +72,8 @@ function Week({ daysOfWeek }: Props) {
 
   // Popover & Modal controls
   const popoverDisclosure = useDisclosure(false);
-  const [isPopoverOpen, { open: openPopover, close: closePopover }] = popoverDisclosure;
+  const [isPopoverOpen, { open: openPopover, close: closePopover }] =
+    popoverDisclosure;
   const modalDisclosure = useDisclosure(false);
   const [isModalOpen, { open: openModal, close: closeModal }] = modalDisclosure;
 
@@ -89,9 +96,10 @@ function Week({ daysOfWeek }: Props) {
 
   const DRAG_THRESHOLD = 5;
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>, ev: EventType) => {
-
-    
+  const handleMouseDown = (
+    e: React.MouseEvent<HTMLDivElement>,
+    ev: EventType
+  ) => {
     if ((e.target as HTMLElement).dataset?.resizeHandle === "true") return;
 
     e.preventDefault();
@@ -112,11 +120,15 @@ function Week({ daysOfWeek }: Props) {
     if (isPopoverOpen) closePopover();
   };
 
-  const handleResizeMouseDown = (e: React.MouseEvent<HTMLDivElement>, ev: EventType) => {
+  const handleResizeMouseDown = (
+    e: React.MouseEvent<HTMLDivElement>,
+    ev: EventType
+  ) => {
     e.preventDefault();
     e.stopPropagation(); // ✅ Prevent drag handler from firing
 
-    const offsetY = e.clientY - e.currentTarget.parentElement!.getBoundingClientRect().top;
+    const offsetY =
+      e.clientY - e.currentTarget.parentElement!.getBoundingClientRect().top;
 
     setActiveEventId(ev.id);
     setResizingEvent({
@@ -133,7 +145,11 @@ function Week({ daysOfWeek }: Props) {
   const POP_PADDING = 10;
 
   // Use this when your popover uses `position: absolute` on the page/body.
-  function calcPopoverCoordsAbsolute(rect: DOMRect, dialogW: number, dialogH: number) {
+  function calcPopoverCoordsAbsolute(
+    rect: DOMRect,
+    dialogW: number,
+    dialogH: number
+  ) {
     const pageX = window.scrollX;
     const pageY = window.scrollY;
 
@@ -145,11 +161,13 @@ function Week({ daysOfWeek }: Props) {
     const viewportBottom = window.innerHeight + pageY;
 
     // Flip to the left if overflowing right edge
-    if (x + dialogW > viewportRight) x = rect.left + pageX - dialogW - POP_PADDING;
+    if (x + dialogW > viewportRight)
+      x = rect.left + pageX - dialogW - POP_PADDING;
 
     // Keep inside vertical viewport
     const elemBottom = rect.top + rect.height + pageY;
-    if (y + dialogH > viewportBottom) y = Math.max(pageY + POP_PADDING, elemBottom - dialogH);
+    if (y + dialogH > viewportBottom)
+      y = Math.max(pageY + POP_PADDING, elemBottom - dialogH);
     if (y < pageY + POP_PADDING) y = pageY + POP_PADDING;
 
     // Keep inside left edge
@@ -163,7 +181,8 @@ function Week({ daysOfWeek }: Props) {
       const row = userRowRefs.current[i];
       if (!row) continue;
       const bounds = row.getBoundingClientRect();
-      if (clientY >= bounds.top && clientY <= bounds.bottom) return filteredUser[i].id;
+      if (clientY >= bounds.top && clientY <= bounds.bottom)
+        return filteredUser[i].id;
     }
     return null;
   };
@@ -189,7 +208,10 @@ function Week({ daysOfWeek }: Props) {
           eventId: pendingDrag.event.id,
           offsetY: pendingDrag.offsetY,
           originalStart: dayjs(pendingDrag.event.start),
-          duration: dayjs(pendingDrag.event.end).diff(pendingDrag.event.start, "minute"),
+          duration: dayjs(pendingDrag.event.end).diff(
+            pendingDrag.event.start,
+            "minute"
+          ),
         });
         setPendingDrag(null);
       } else {
@@ -254,7 +276,13 @@ function Week({ daysOfWeek }: Props) {
         end: finalEnd.toISOString(),
       };
 
-      setEvents((prev) => prev.map((ev) => (ev.id === resizingEvent.eventId ? { ...ev, end: finalEnd.toISOString() } : ev)));
+      setEvents((prev) =>
+        prev.map((ev) =>
+          ev.id === resizingEvent.eventId
+            ? { ...ev, end: finalEnd.toISOString() }
+            : ev
+        )
+      );
     }
   };
   const openEventDetailsFromEl = (el: HTMLElement, eventId: number) => {
@@ -267,7 +295,12 @@ function Week({ daysOfWeek }: Props) {
     setClientX(x);
     setClientY(y);
     setActiveEventId(eventId);
-    setPopoverContent(<EventDetails handleOpenEditEventModal={handleOpenEditEventModal} eventId={eventId} />);
+    setPopoverContent(
+      <EventDetails
+        handleOpenEditEventModal={handleOpenEditEventModal}
+        eventId={eventId}
+      />
+    );
     openPopover();
   };
 
@@ -320,7 +353,9 @@ function Week({ daysOfWeek }: Props) {
   // ===========================
   // Popover positioning
   // ===========================
-  const getPopoverPosition = (e: React.PointerEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) => {
+  const getPopoverPosition = (
+    e: React.PointerEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>
+  ) => {
     e.stopPropagation();
     const target = e.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
@@ -344,7 +379,9 @@ function Week({ daysOfWeek }: Props) {
       const clickedInside =
         Array.from(children).some((el) => el.contains(event.target as Node)) ||
         dialog.contains(event.target as Node) ||
-        !!document.querySelector(".mantine-ColorInput-dropdown")?.contains(event.target as Node);
+        !!document
+          .querySelector(".mantine-ColorInput-dropdown")
+          ?.contains(event.target as Node);
       if (!clickedInside) {
         closePopover();
         setActiveEventId(null);
@@ -360,7 +397,9 @@ function Week({ daysOfWeek }: Props) {
   // ===========================
 
   const handleOpenEditEventModal = (eventId: number) => {
-    setModalContent(<EditEventForm eventId={eventId} closeModal={closeModal} />);
+    setModalContent(
+      <EditEventForm eventId={eventId} closeModal={closeModal} />
+    );
     openModal();
     if (isPopoverOpen) return closePopover();
   };
@@ -371,7 +410,12 @@ function Week({ daysOfWeek }: Props) {
     userId: 0,
   });
 
-  const handleAddSimpleEvent = (e: React.PointerEvent<HTMLDivElement>, day: Dayjs, hour: Dayjs, userId: number) => {
+  const handleAddSimpleEvent = (
+    e: React.PointerEvent<HTMLDivElement>,
+    day: Dayjs,
+    hour: Dayjs,
+    userId: number
+  ) => {
     e.stopPropagation();
     getPopoverPosition(e);
     const startDate = day.hour(hour.hour()).minute(hour.minute());
@@ -381,15 +425,35 @@ function Week({ daysOfWeek }: Props) {
       hour,
       userId,
     });
-    setPopoverContent(<AddEventForm closePopover={closePopover} start={startDate} end={endDate} userId={userId} handleOpenDetailsForm={handleOpenDetailsForm} />);
+    setPopoverContent(
+      <AddEventForm
+        closePopover={closePopover}
+        start={startDate}
+        end={endDate}
+        userId={userId}
+        handleOpenDetailsForm={handleOpenDetailsForm}
+      />
+    );
     setActiveEventId(null);
   };
 
-  const handleAddDetailsEvent = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, day: Dayjs, hour: Dayjs, userId: number) => {
+  const handleAddDetailsEvent = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    day: Dayjs,
+    hour: Dayjs,
+    userId: number
+  ) => {
     e.preventDefault();
     const startDate = day.hour(hour.hour()).minute(hour.minute());
     const endDate = startDate.add(30, "minute");
-    setModalContent(<AddDetailsEventForm start={startDate} end={endDate} userId={userId} closeModal={closeModal} />);
+    setModalContent(
+      <AddDetailsEventForm
+        start={startDate}
+        end={endDate}
+        userId={userId}
+        closeModal={closeModal}
+      />
+    );
     if (isPopoverOpen) {
       closePopover();
     }
@@ -398,7 +462,14 @@ function Week({ daysOfWeek }: Props) {
   };
 
   const handleOpenDetailsForm = (start: Dayjs, end: Dayjs, userId: number) => {
-    setModalContent(<AddDetailsEventForm start={start} end={end} userId={userId} closeModal={closeModal} />);
+    setModalContent(
+      <AddDetailsEventForm
+        start={start}
+        end={end}
+        userId={userId}
+        closeModal={closeModal}
+      />
+    );
     openModal();
     closePopover();
   };
@@ -406,23 +477,39 @@ function Week({ daysOfWeek }: Props) {
   const handleCloseSimpleForm = () => {
     closePopover();
   };
-  const handleShowEventDetails = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, eventId: number) => {
+  const handleShowEventDetails = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    eventId: number
+  ) => {
     getPopoverPosition(e);
-    setPopoverContent(<EventDetails handleOpenEditEventModal={handleOpenEditEventModal} eventId={eventId} />);
+    setPopoverContent(
+      <EventDetails
+        handleOpenEditEventModal={handleOpenEditEventModal}
+        eventId={eventId}
+      />
+    );
   };
 
 
+
+  
+  const visibleUsers = useMemo(() => {
+  if (can(user, "view:own")) return filteredUser;
+    return filteredUser.filter(u => u.id === user.id);
+  }, [filteredUser, user]);
+
+
+
   const tableRows = useMemo(() => {
-    return filteredUser.map((user, userIndex) => (
-     
+    return visibleUsers
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((user, userIndex) => (
         <tr
           key={user.id}
           ref={(el) => {
             userRowRefs.current[userIndex] = el;
           }}
         >
-            {/* <UserHeader daysOfWeek={daysOfWeek} handleMouseDown={handleMouseDown} cellRefs={cellRefs} userId={user.id} userIndex={userIndex} /> */}
-
           <td className={styles.userTableRow}>
             <SidebarUsers userId={user.id} />
           </td>
@@ -445,16 +532,38 @@ function Week({ daysOfWeek }: Props) {
             handleShowEventDetails={handleShowEventDetails}
           />
         </tr>
-      
-    ));
-  }, [filteredUser, events, daysOfWeek, cellRefs, handleMouseDown, handleResizeMouseDown, handleAddSimpleEvent, handleAddDetailsEvent, activeEventId, handleShowEventDetails]);
+      ));
+  }, [
+    visibleUsers,
+    events,
+    daysOfWeek,
+    cellRefs,
+    handleMouseDown,
+    handleResizeMouseDown,
+    handleAddSimpleEvent,
+    handleAddDetailsEvent,
+    activeEventId,
+    handleShowEventDetails,
+  ]);
 
   return (
-    <div style={{marginTop:"30px"}} ref={containerRef}>
-      <GlobalPopover ref={dialogRef} popoverOpened={isPopoverOpen} handleCloseSimpleForm={handleCloseSimpleForm} popoverContent={popoverContent} clientX={clientX} clientY={clientY} />
+    <div style={{ marginTop: "30px" }} ref={containerRef}>
+      <GlobalPopover
+        ref={dialogRef}
+        popoverOpened={isPopoverOpen}
+        handleCloseSimpleForm={handleCloseSimpleForm}
+        popoverContent={popoverContent}
+        clientX={clientX}
+        clientY={clientY}
+      />
 
-      <GlobalModal isModalOpen={isModalOpen} title="Add Details Event" closeModal={closeModal} modalContent={modalContent} size="lg" />
-
+      <GlobalModal
+        isModalOpen={isModalOpen}
+        title="Add Details Event"
+        closeModal={closeModal}
+        modalContent={modalContent}
+        size="lg"
+      />
       <div style={{ overflowX: "auto" }}>
         <table style={{ borderCollapse: "collapse", width: "100%" }}>
           <thead className={styles.calendarWeekHeader}>

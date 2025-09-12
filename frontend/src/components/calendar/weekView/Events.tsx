@@ -15,10 +15,19 @@ type Props = {
   postionedEvents: EventWithColumn[];
   day: dayjs.Dayjs;
   SLOT_HEIGHT: number;
-  handleMouseDown: (e: React.MouseEvent<HTMLDivElement>, ev: EventWithColumn) => void;
-  handleResizeMouseDown: (e: React.MouseEvent<HTMLDivElement>, ev: EventWithColumn) => void;
+  handleMouseDown: (
+    e: React.MouseEvent<HTMLDivElement>,
+    ev: EventWithColumn
+  ) => void;
+  handleResizeMouseDown: (
+    e: React.MouseEvent<HTMLDivElement>,
+    ev: EventWithColumn
+  ) => void;
   activeEventId: number | null;
-  handleShowEventDetails: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, eventId: number) => void;
+  handleShowEventDetails: (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    eventId: number
+  ) => void;
 };
 
 /**
@@ -29,7 +38,11 @@ function computeColumnsForEvents(events: EventWithColumn[]): EventWithColumn[] {
   if (!events.length) return [];
 
   // Sort by start time, then end time
-  const sorted = [...events].sort((a, b) => dayjs(a.start).valueOf() - dayjs(b.start).valueOf() || dayjs(a.end).valueOf() - dayjs(b.end).valueOf());
+  const sorted = [...events].sort(
+    (a, b) =>
+      dayjs(a.start).valueOf() - dayjs(b.start).valueOf() ||
+      dayjs(a.end).valueOf() - dayjs(b.end).valueOf()
+  );
 
   const positioned: EventWithColumn[] = [];
   let i = 0;
@@ -79,7 +92,15 @@ function computeColumnsForEvents(events: EventWithColumn[]): EventWithColumn[] {
   return positioned;
 }
 
-function Events({ postionedEvents, day, SLOT_HEIGHT, handleMouseDown, handleResizeMouseDown, activeEventId, handleShowEventDetails }: Props) {
+function Events({
+  postionedEvents,
+  day,
+  SLOT_HEIGHT,
+  handleMouseDown,
+  handleResizeMouseDown,
+  activeEventId,
+  handleShowEventDetails,
+}: Props) {
   // Compute correct columns for the given day's events
   const positioned = computeColumnsForEvents(postionedEvents);
 
@@ -93,7 +114,9 @@ function Events({ postionedEvents, day, SLOT_HEIGHT, handleMouseDown, handleResi
         const eventEnd = dayjs(ev.end);
 
         // Clip event to visible day segment
-        const segmentStart = eventStart.isBefore(dayStart) ? dayStart : eventStart;
+        const segmentStart = eventStart.isBefore(dayStart)
+          ? dayStart
+          : eventStart;
         const segmentEnd = eventEnd.isAfter(dayEnd) ? dayEnd : eventEnd;
 
         if (segmentEnd.isBefore(dayStart) || segmentStart.isAfter(dayEnd)) {
@@ -101,7 +124,8 @@ function Events({ postionedEvents, day, SLOT_HEIGHT, handleMouseDown, handleResi
         }
 
         const top = (segmentStart.diff(dayStart, "minute") / 30) * SLOT_HEIGHT;
-        const height = (segmentEnd.diff(segmentStart, "minute") / 30) * SLOT_HEIGHT;
+        const height =
+          (segmentEnd.diff(segmentStart, "minute") / 30) * SLOT_HEIGHT;
 
         const cols = Math.max(1, ev.totalColumns);
         const colIndex = Math.max(0, Math.min(ev.column, cols - 1));
@@ -110,11 +134,16 @@ function Events({ postionedEvents, day, SLOT_HEIGHT, handleMouseDown, handleResi
         const leftPercent = (colIndex / cols) * 100;
 
         const styleLeft = `calc(${leftPercent}% + ${GAP * colIndex}px)`;
-        const styleWidth = `calc(${widthPercent}% - ${(GAP * (cols - 1)) / cols}px)`;
+        const styleWidth = `calc(${widthPercent}% - ${
+          (GAP * (cols - 1)) / cols
+        }px)`;
 
-        const timeRange = `${segmentStart.format("HH:mm")} - ${segmentEnd.format("HH:mm")}`;
+        const timeRange = `${segmentStart.format(
+          "HH:mm"
+        )} - ${segmentEnd.format("HH:mm")}`;
 
-        const isLongerThan30Min = dayjs(ev.end).diff(dayjs(ev.start), "minute") > 30;
+        const isLongerThan30Min =
+          dayjs(ev.end).diff(dayjs(ev.start), "minute") > 30;
 
         return (
           <div
@@ -122,7 +151,11 @@ function Events({ postionedEvents, day, SLOT_HEIGHT, handleMouseDown, handleResi
             key={`${ev.id}-${day.format("YYYYMMDD")}`}
             onMouseDown={(e) => handleMouseDown(e, ev)}
             onClick={(e) => handleShowEventDetails(e, ev.id)}
-            className={`${ev.id === activeEventId ? `${styles.activeEvent} ${styles.events}` : styles.events}`}
+            className={`${
+              ev.id === activeEventId
+                ? `${styles.activeEvent} ${styles.events}`
+                : styles.events
+            }`}
             style={{
               position: "absolute",
               top,
@@ -131,11 +164,34 @@ function Events({ postionedEvents, day, SLOT_HEIGHT, handleMouseDown, handleResi
               height,
             }}
           >
-            <div style={{ height: "100%", width: "4px", background: ev.color, zIndex: 1 }}></div>
+            <div
+              style={{
+                height: "100%",
+                width: "4px",
+                background: ev.color,
+                zIndex: 1,
+              }}
+            ></div>
 
-            <div style={{ background: hexToRgba(ev.color, 0.22), width: "100%", zIndex: 1 }}>
+            <div
+              style={{
+                background: hexToRgba(ev.color, 0.22),
+                width: "100%",
+                zIndex: 1,
+              }}
+            >
               {ev.note && (
-                <Tooltip color={"black"} arrowOffset={10} w={200} transitionProps={{ duration: 300 }} multiline arrowSize={4} withArrow position="right" label={ev.note}>
+                <Tooltip
+                  color={"black"}
+                  arrowOffset={10}
+                  w={200}
+                  transitionProps={{ duration: 300 }}
+                  multiline
+                  arrowSize={4}
+                  withArrow
+                  position="right"
+                  label={ev.note}
+                >
                   <div className={styles.eventNote}>
                     <GiPin />
                   </div>
@@ -143,15 +199,27 @@ function Events({ postionedEvents, day, SLOT_HEIGHT, handleMouseDown, handleResi
               )}
 
               <div className={styles.eventContent}>
-                <div className={styles.eventHeader} style={{ color: "white", background: ev.color }}>
+                <div
+                  className={styles.eventHeader}
+                  style={{ color: "white", background: ev.color }}
+                >
                   <p className={styles.eventTitle}>{ev.title}</p>
                 </div>
 
-                <div style={{ padding: 3, display: isLongerThan30Min ? "block" : "none" }}>
+                <div
+                  style={{
+                    padding: 3,
+                    display: isLongerThan30Min ? "block" : "none",
+                  }}
+                >
                   <div className={styles.eventCreator}>
                     <div className={styles.eventAvatar}>
                       <Avatar
-                        src={ev.organizer?.image ? `${uploadsUrl}${ev.organizer.image}` : undefined} // only use src if image exists
+                        src={
+                          ev.organizer?.image
+                            ? `${uploadsUrl}${ev.organizer.image}`
+                            : undefined
+                        } // only use src if image exists
                         color={ev.organizer?.color}
                         alt="Profile Image"
                         radius="50%"
@@ -169,13 +237,23 @@ function Events({ postionedEvents, day, SLOT_HEIGHT, handleMouseDown, handleResi
 
                   {ev.description && (
                     <div className={styles.eventDecsContainer}>
-                      <div className={styles.eventDesc} dangerouslySetInnerHTML={{ __html: ev.description }} />
+                      {/* Render rich text stored in event description */}
+                      <div
+                        className={styles.eventDesc}
+                        dangerouslySetInnerHTML={{ __html: ev.description }}
+                      />
                     </div>
                   )}
                 </div>
               </div>
 
-              {segmentEnd.isSame(ev.end) && <div data-resize-handle="true" onMouseDown={(e) => handleResizeMouseDown(e, ev)} className={styles.resizer} />}
+              {segmentEnd.isSame(ev.end) && (
+                <div
+                  data-resize-handle="true"
+                  onMouseDown={(e) => handleResizeMouseDown(e, ev)}
+                  className={styles.resizer}
+                />
+              )}
             </div>
           </div>
         );

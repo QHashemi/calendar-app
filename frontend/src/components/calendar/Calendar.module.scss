@@ -61,9 +61,18 @@
   width: 100%;
 }
 .userSidebar {
-  min-width: 200px;
-  box-shadow: $shadow-base;
-  min-height: 100%;
+  min-width: 160px;
+  // box-shadow: $shadow-base;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 720px;
+  .userDetails {
+    font-size: 10px;
+    margin-left: 5px;
+    text-align: center;
+  }
   p {
     text-transform: rotate(-90deg);
     margin: 0;
@@ -101,6 +110,7 @@
 
 .userTableRow {
   border: 1px solid $border-color-v1;
+  height: 100%;
   .sidebarUser {
     @include center;
     height: 100%;

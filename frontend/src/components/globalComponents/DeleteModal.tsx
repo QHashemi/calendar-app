@@ -10,6 +10,7 @@ type Props = {
   deleteText: string;
   onConfirm: () => void; // <-- instead of handleDeleteAction(id:number)
   isButton: boolean;
+
 };
 
 function DeleteButton({ size, title, buttonTitle, deleteText, onConfirm, isButton }: Props) {
@@ -23,10 +24,12 @@ function DeleteButton({ size, title, buttonTitle, deleteText, onConfirm, isButto
       confirmProps: { color: "red" },
       onCancel: () => console.log("Cancel"),
       onConfirm,
+
     });
 
   return isButton ? (
-    <Button size={size} variant="outline" onClick={openDeleteModal} color="red">
+    <Button size={size} variant="outline" onClick={openDeleteModal} color="red" onPointerDown={(e) => e.stopPropagation()}
+>
       Delete
     </Button>
   ) : (

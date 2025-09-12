@@ -9,7 +9,7 @@ import { User } from "../db/models/UserModel";
 // Create component
 const create_component = async (req: Request, res: Response) => {
   try {
-    console.log(req.body);
+   
     const { name, roles = [], permissions = [], created_by } = req.body as { name: string; roles?: (string | number)[]; permissions?: (string | number)[]; created_by: string };
 
     const componentRepo = AppDataSource.getRepository(Component);

@@ -22,6 +22,7 @@ import { AppDispatch, RootState } from "@/Api/store";
 import { update_event, selectEventByEventId } from "@/Api/slices/EventSlice";
 import { selectCredentialState } from "@/Api/slices/CredentialsSlice";
 import useAxiosPrivate from "@/Api/useAxiosPrivate";
+import Editor from "@components/globalComponents/TextEditor";
 
 type Props = {
   eventId: number;
@@ -32,7 +33,9 @@ export default function EditEventForm({ eventId, closeModal }: Props) {
   const dispatch = useDispatch<AppDispatch>();
   const users = useSelector(selectUsers);
   const { user } = useSelector(selectCredentialState);
-  const event = useSelector((state: RootState) => selectEventByEventId(state, eventId));
+  const event = useSelector((state: RootState) =>
+    selectEventByEventId(state, eventId)
+  );
   const axiosInstance = useAxiosPrivate();
 
   const form = useForm({
@@ -53,7 +56,9 @@ export default function EditEventForm({ eventId, closeModal }: Props) {
       id: event?.id,
       title: values.event_name,
       color: values.event_color,
-      start: values.event_start ? dayjs(values.event_start).toISOString() : null,
+      start: values.event_start
+        ? dayjs(values.event_start).toISOString()
+        : null,
       end: values.event_end ? dayjs(values.event_end).toISOString() : null,
       creatorId: user.id,
       helpers: values.event_helpers.map((id) => parseInt(id, 10)),
@@ -64,7 +69,11 @@ export default function EditEventForm({ eventId, closeModal }: Props) {
 
     try {
       await dispatch(
-        update_event({ axiosInstance, value: data, componentType: "update_event_modal" })
+        update_event({
+          axiosInstance,
+          value: data,
+          componentType: "update_event_modal",
+        })
       ).unwrap();
       closeModal();
     } catch (error) {
@@ -102,7 +111,10 @@ export default function EditEventForm({ eventId, closeModal }: Props) {
             label="Helpers"
             placeholder="Select helpers"
             size="xs"
-            data={users.map((u) => ({ value: String(u.id), label: u.display_name }))}
+            data={users.map((u) => ({
+              value: String(u.id),
+              label: u.display_name,
+            }))}
             {...form.getInputProps("event_helpers")}
             searchable
             clearable
@@ -146,13 +158,13 @@ export default function EditEventForm({ eventId, closeModal }: Props) {
             {...form.getInputProps("event_location")}
           />
 
-          <Textarea
-            label="Description"
+          <Editor
+            value={form.values.event_description}
+            onChange={(content) =>
+              form.setFieldValue("event_description", content)
+            }
+            height={150} // optional, adjust as needed
             placeholder="Enter event description"
-            size="xs"
-            autosize
-            minRows={2}
-            {...form.getInputProps("event_description")}
           />
 
           <Textarea

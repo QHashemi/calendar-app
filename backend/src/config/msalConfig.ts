@@ -6,6 +6,7 @@ import msal from "@azure/msal-node";
 dotenv.config();
 
 const { CLIENT_ID, CLIENT_SECRET, TENANT_ID, AAD_ENDPOINT, GRAPH_ENDPOINT } = process.env;
+
 if (!CLIENT_ID || !CLIENT_SECRET || !TENANT_ID || !AAD_ENDPOINT || !GRAPH_ENDPOINT) {
     throw new Error("Missing required env vars");
 }

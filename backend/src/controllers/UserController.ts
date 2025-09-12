@@ -16,26 +16,22 @@ const create_user = async (req: Request, res: Response) => {
     const permissionRepo = AppDataSource.getRepository(Permission);
     const credentialRepo = AppDataSource.getRepository(Credential);
 
-    const {
-      first_name,
-      last_name,
-      email,
-      title,
-      job,
-      color,
-      gender,
-      has_personal_calendar,
-      roles, // optional array of role IDs
-      extra_permissions, // optional array of permission IDs
-      password, // optional
-      confirm_password, // optional
-    } = req.body;
+    const { first_name, last_name, email, title, job, color, gender, has_personal_calendar, roles, extra_permissions, password, confirm_password, } = req.body;
 
     // Check if user exists
     const existingUser = await userRepo.findOneBy({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User with this email already exists" });
+      return res
+        .status(400)
+        .json({ message: "User with this email already exists" });
     }
+
+    // Get max sort_order
+    const maxSort = await userRepo
+      .createQueryBuilder("user")
+      .select("MAX(user.sort_order)", "max")
+      .getRawOne();
+    const nextSortOrder = (maxSort?.max ?? 0) + 1;
 
     // Create new user
     const newUser = userRepo.create({
@@ -48,6 +44,7 @@ const create_user = async (req: Request, res: Response) => {
       gender,
       has_personal_calendar,
       display_name: `${first_name} ${last_name}`,
+      sort_order: nextSortOrder,
     });
 
     // Assign roles if provided
@@ -71,26 +68,33 @@ const create_user = async (req: Request, res: Response) => {
 
     // Create credentials if password provided
     if (password || confirm_password) {
-      if (password !== confirm_password) {
-        return res.status(400).json({ message: "Passwords do not match" });
-      }
+      if (password?.trim() && confirm_password?.trim()) {
+        if (password !== confirm_password) {
+          return res.status(400).json({ message: "Passwords do not match" });
+        }
 
-      const password_hash = await bcrypt.hash(password, 10);
-      const credential = credentialRepo.create({
-        password_hash,
-        password_algo: "bcrypt",
-        failed_attempts: 0,
-        user: addedUser,
-      });
-      await credentialRepo.save(credential);
+        const password_hash = await bcrypt.hash(password, 10);
+        const credential = credentialRepo.create({
+          password_hash,
+          password_algo: "bcrypt",
+          failed_attempts: 0,
+          user: addedUser,
+        });
+        await credentialRepo.save(credential);
+      }
     }
 
-    return res.status(201).json({ data: addedUser, msg: "The user has been added" });
+    return res
+      .status(201)
+      .json({ data: addedUser, msg: "The user has been added" });
   } catch (error: any) {
     console.error(error);
-    return res.status(500).json({ error: `Internal server error: ${error.message}` });
+    return res
+      .status(500)
+      .json({ error: `Internal server error: ${error.message}` });
   }
 };
+
 const get_users = async (_req: Request, res: Response) => {
   try {
     const userRepo = AppDataSource.getRepository(User);
@@ -138,6 +142,40 @@ const delete_user = async (req: Request, res: Response) => {
   }
 };
 
+const update_user_order = async (req: Request, res: Response) => {
+  try {
+    const { reorderedUsers } = req.body;
+    // expected: [{ id: 1, sort_order: 1 }, { id: 5, sort_order: 2 }, ...]
+
+    if (!Array.isArray(reorderedUsers)) {
+      return res.status(400).json({ msg: "Invalid payload" });
+    }
+
+    const userRepo = AppDataSource.getRepository(User);
+
+    const updatedUsers: User[] = [];
+
+    for (const { id, sort_order } of reorderedUsers) {
+      const user = await userRepo.findOne({ where: { id }, relations: ["roles", "extra_permissions"], });
+      if (user) {
+        user.sort_order = sort_order;
+        updatedUsers.push(user);
+      }
+    }
+
+    await userRepo.save(updatedUsers);
+
+    return res.json({
+      msg: "User order updated successfully",
+      updatedUsers,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      error: `Internal server error: ${error.message}`,
+    });
+  }
+};
+
 const update_user = async (req: Request, res: Response) => {
   try {
     const userRepo = AppDataSource.getRepository(User);
@@ -175,9 +213,10 @@ const update_user = async (req: Request, res: Response) => {
     userRepo.merge(user, otherFields);
 
     await userRepo.save(user);
-    console.log(user);
 
-    return res.status(200).json({ msg: "User updated successfully", data: user });
+    return res
+      .status(200)
+      .json({ msg: "User updated successfully", data: user });
   } catch (error: any) {
     return res.status(500).json({
       error: `Internal server error: ${error.message}`,
@@ -199,7 +238,11 @@ const update_profile_image = async (req: Request, res: Response) => {
 
       // Remove old image if exists
       if (user.image) {
-        const oldImagePath = path.join(__dirname, "../uploads/profiles", path.basename(user.image));
+        const oldImagePath = path.join(
+          __dirname,
+          "../uploads/profiles",
+          path.basename(user.image)
+        );
 
         if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath);
       }
@@ -211,10 +254,21 @@ const update_profile_image = async (req: Request, res: Response) => {
     userRepo.merge(user);
     await userRepo.save(user);
 
-    return res.status(200).json({ msg: "User updated successfully", data: user });
+    return res
+      .status(200)
+      .json({ msg: "User updated successfully", data: user });
   } catch (error: any) {
-    return res.status(500).json({ error: `Internal server error: ${error.message}` });
+    return res
+      .status(500)
+      .json({ error: `Internal server error: ${error.message}` });
   }
 };
 
-export { get_users, create_user, delete_user, update_user, update_profile_image };
+export {
+  get_users,
+  create_user,
+  delete_user,
+  update_user,
+  update_profile_image,
+  update_user_order,
+};

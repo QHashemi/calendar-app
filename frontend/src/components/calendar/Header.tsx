@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./Calendar.module.scss";
-import { Button } from "@mantine/core";
+import { Button, Switch } from "@mantine/core"; // ✅ import Switch
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 type props = {
@@ -9,9 +9,18 @@ type props = {
   weekStartDate: dayjs.Dayjs;
   calendarType: string;
   setCalendarType: React.Dispatch<React.SetStateAction<string>>;
+  showWeekend: boolean; // ✅ new prop
+  setShowWeekend: React.Dispatch<React.SetStateAction<boolean>>; // ✅ new prop
 };
 
-export default function Header({ setWeekStartDate, weekStartDate, calendarType, setCalendarType }: props) {
+export default function Header({
+  setWeekStartDate,
+  weekStartDate,
+  calendarType,
+  setCalendarType,
+  showWeekend,
+  setShowWeekend,
+}: props) {
   const handleNextWeek = () => {
     setWeekStartDate((prev) => prev.add(1, "week"));
   };
@@ -32,12 +41,18 @@ export default function Header({ setWeekStartDate, weekStartDate, calendarType, 
     }
   };
 
-  const [titleValue, setTitleValue] = useState<string>(`Woche ${weekStartDate.isoWeek()}`);
+  const [titleValue, setTitleValue] = useState<string>(
+    `Woche ${weekStartDate.isoWeek()}`
+  );
 
   const calendarButtonRef = useRef<HTMLDivElement>(null);
-  const handleWeekCalendar = (e: React.MouseEvent<HTMLButtonElement>, calendarType: string) => {
+  const handleWeekCalendar = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    calendarType: string
+  ) => {
     const type = calendarType.toLowerCase();
-    const btnParentTarget = calendarButtonRef.current?.querySelectorAll<HTMLElement>("[data-title]");
+    const btnParentTarget =
+      calendarButtonRef.current?.querySelectorAll<HTMLElement>("[data-title]");
     if (!btnParentTarget) return;
 
     btnParentTarget.forEach((el) => {
@@ -68,22 +83,60 @@ export default function Header({ setWeekStartDate, weekStartDate, calendarType, 
   return (
     <div className={styles.header}>
       <div className={styles.headerLeft}>
-        <Button size="xs" variant="filled" onClick={handlePrevWeek} rightSection={<FaChevronLeft />}></Button>
-        <Button size="xs" variant="filled" onClick={handleNextWeek} rightSection={<FaChevronRight />}></Button>
+        <Button
+          size="xs"
+          variant="filled"
+          onClick={handlePrevWeek}
+          rightSection={<FaChevronLeft />}
+        ></Button>
+        <Button
+          size="xs"
+          variant="filled"
+          onClick={handleNextWeek}
+          rightSection={<FaChevronRight />}
+        ></Button>
       </div>
+
       <div className={styles.headerTitle}>{titleValue}</div>
 
       <div className={styles.headerRight} ref={calendarButtonRef}>
+        {/* ✅ Weekend Toggle */}
+        <Switch
+          size="sm"
+          onLabel="ON"
+          offLabel="OFF"
+          label="Show Weekend"
+          checked={showWeekend}
+          onChange={(e) => setShowWeekend(e.currentTarget.checked)}
+          ml="md"
+        />
         <Button variant="default" size="xs" onClick={handleToday}>
           Today
         </Button>
-        <Button disabled variant="filled" size="xs" data-title="month" onClick={(e) => handleWeekCalendar(e, "month")}>
+        <Button
+          disabled
+          variant="filled"
+          size="xs"
+          data-title="month"
+          onClick={(e) => handleWeekCalendar(e, "month")}
+        >
           Month
         </Button>
-        <Button variant="filled" size="xs" data-title="week" onClick={(e) => handleWeekCalendar(e, "week")}>
+        <Button
+          variant="filled"
+          size="xs"
+          data-title="week"
+          onClick={(e) => handleWeekCalendar(e, "week")}
+        >
           Week
         </Button>
-        <Button disabled variant="filled" size="xs" data-title="day" onClick={(e) => handleWeekCalendar(e, "day")}>
+        <Button
+          disabled
+          variant="filled"
+          size="xs"
+          data-title="day"
+          onClick={(e) => handleWeekCalendar(e, "day")}
+        >
           Day
         </Button>
       </div>

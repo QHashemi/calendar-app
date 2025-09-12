@@ -119,7 +119,7 @@ export default function ProfileForm() {
 
     try {
       await dispatch(update_user({ axiosInstance, value: data, id: user.id, componentType: "update_user_profile_form" })).unwrap();
-      //await dispatch(refresh_account({ axiosInstance, componentType: "refresh_account" })).unwrap();
+      await dispatch(refresh_account({ axiosInstance, componentType: "refresh_account" })).unwrap();
     } catch (error) {
       console.error("Failed to update profile", error);
     }

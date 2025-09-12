@@ -70,4 +70,22 @@ export const Roles: Record<string, PermissionType[]> = {
   ],
 
   user: [Permissions.ADD_OWN, Permissions.EDIT_OWN, Permissions.DELETE_OWN],
+    admin: [
+
+    // Events
+    Permissions.ADD_EVENT,
+    Permissions.EDIT_EVENT,
+    Permissions.DELETE_EVENT,
+
+    // Users
+    Permissions.ADD_USER,
+    Permissions.EDIT_USER,
+    Permissions.DELETE_USER,
+
+    // Own resources
+    Permissions.ADD_OWN,
+    Permissions.EDIT_OWN,
+    Permissions.DELETE_OWN,
+
+  ],
 };

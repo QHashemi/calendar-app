@@ -19,4 +19,12 @@ const axiosPrivate = axios.create({
   },
 });
 
+const axiosPublicAPI = axios.create({
+  baseURL: "https://date.nager.at/api/v3/publicholidays/2025/AT",
+    headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json;charset=UTF-8",
+  },
+})
+
 export { axiosPublic, axiosPrivate };

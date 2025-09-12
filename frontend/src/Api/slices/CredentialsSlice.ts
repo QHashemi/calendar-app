@@ -81,6 +81,7 @@ export const register_new_user = createAsyncThunk("credentials/registerNewUser",
 
 export const login_user = createAsyncThunk("credentials/loginUser", async ({ value, componentType }: AsyncThunkPublicResponseType, { rejectWithValue }) => {
   try {
+
     const response = await axiosPublic.post("login", value);
 
     return { ...response.data, componentType };

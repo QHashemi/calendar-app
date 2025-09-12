@@ -8,12 +8,12 @@ import { Component } from "./db/models/ComponentModel";
 import { User } from "./db/models/UserModel";
 
 const ComponentsRolesMap: Record<string, string[]> = {
-  Profile: ["superadmin", "user"],
-  Dashboard: ["superadmin", "user"],
-  Users: ["superadmin"],
-  Calendar: ["superadmin", "user"],
-  Events: ["superadmin", "user"],
-  Settings: ["superadmin"],
+  Profile: ["superadmin", "user", "admin"],
+  Dashboard: ["superadmin", "user", "admin"],
+  Users: ["superadmin", "admin"],
+  Calendar: ["superadmin", "user", "admin"],
+  Events: ["superadmin", "user", "admin"],
+  Settings: ["superadmin", ],
 };
 
 export async function seedRolesPermissionsAndComponents() {
@@ -96,12 +96,12 @@ export async function seedRolesPermissionsAndComponents() {
 
       await componentRepo.save(component);
 
-      console.log(`🧩 Component seeded: ${componentName} with roles [${component.roles.map((r) => r.name).join(", ")}]`);
+      console.log(`Component seeded: ${componentName} with roles [${component.roles.map((r) => r.name).join(", ")}]`);
     }
 
-    console.log("🌱 Roles, permissions, and components seeded successfully!");
+    console.log("Roles, permissions, and components seeded successfully!");
   } catch (error) {
-    console.error("❌ Error seeding components:", error);
+    console.error(" Error seeding components:", error);
     throw error;
   }
 }

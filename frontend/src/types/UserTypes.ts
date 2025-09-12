@@ -12,6 +12,7 @@ type UserType = {
   email: string;
   color: string;
   roles: RoleType[],
+  sort_order: number,
   extra_permissions: PermissionType[]
   gender?: string | null; // ✅ Allow string
   title: string;

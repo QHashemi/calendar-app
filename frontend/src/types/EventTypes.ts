@@ -10,13 +10,14 @@ type EventType = {
   note: string;
   owner:UserType;
   is_all_day: boolean;
-  is_ms_event:boolean;
+  event_type:string;
   organizer:UserType;
   location:string;
   helpers:UserType[];
-    created_by: UserType
+  created_by: UserType
   created_at: string;
   updated_at: string;
+
 
 }
 

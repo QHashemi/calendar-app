@@ -6,6 +6,9 @@ import { In } from "typeorm";
 import jwt from "jsonwebtoken";
 import { JWT_ACCESS_TOKEN_SECRET_PUBLICKEY } from "../accessTokenConfig";
 import get_office_user_calendar from "../helpers/get_office_user_calendar";
+import { get_holidays } from "../helpers/get_holiday";
+
+
 const create_event = async (req: Request, res: Response) => {
   try {
     const eventRepo = AppDataSource.getRepository(Event);
@@ -45,7 +48,7 @@ const create_event = async (req: Request, res: Response) => {
       created_by: organizer,
       location,
       helpers: event_helpers,
-      is_ms_event: false,
+      event_type:"work_event"
     });
 
     // Save event to DB
@@ -56,6 +59,8 @@ const create_event = async (req: Request, res: Response) => {
     return res.status(500).json({ error: `Internal server error: ${error.message}` });
   }
 };
+
+
 
 const get_events = async (req: Request, res: Response) => {
   try {
@@ -79,12 +84,15 @@ const get_events = async (req: Request, res: Response) => {
     // Fetch office events
     const officeCalendar = await get_office_user_calendar(userEmail);
 
+    // Fetch holiday events
+    const holidayCalendar = await get_holidays(); 
+    // holidayCalendar should return the JSON you pasted
+
+    // --- Insert Office events ---
     for (const officeEvent of officeCalendar) {
-      // Map Office event to your Event entity fields
       const start = new Date(officeEvent.start.dateTime);
       const end = new Date(officeEvent.end.dateTime);
 
-      // Check if this event already exists in DB (based on start/end/title)
       const existingEvent = await eventRepo.findOne({
         where: { start, end, title: officeEvent.subject, owner: { id: user.id } },
       });
@@ -99,22 +107,48 @@ const get_events = async (req: Request, res: Response) => {
           is_all_day: officeEvent.isAllDay || false,
           color: "yellow",
           owner: user,
-          organizer: user, // or map to organizer if you store organizer separately
-          is_ms_event: true
+          organizer: user,
+          event_type: "outlook_event",
         });
 
         await eventRepo.save(newEvent);
       }
     }
 
+    // --- Insert Holiday events ---
+    for (const holiday of holidayCalendar) {
+      const start = new Date(holiday.date);
+      const end = new Date(holiday.date); // holidays are usually one-day events
+
+      const existingHoliday = await eventRepo.findOne({
+        where: { start, end, title: holiday.name, owner: { id: user.id } },
+      });
+
+      if (!existingHoliday) {
+        const newHoliday = eventRepo.create({
+          start,
+          end,
+          title: holiday.name,
+          description: holiday.localName,
+          location: holiday.countryCode,
+          is_all_day: true,
+          color: "green",
+          owner: user,
+          organizer: user,
+          event_type: "holiday_event",
+        });
+
+        await eventRepo.save(newHoliday);
+      }
+    }
+
     // Fetch all events with relations
     const events = await eventRepo.find({
-      relations: ["owner", "organizer", "helpers","created_by"],
+      relations: ["owner", "organizer", "helpers", "created_by"],
     });
 
-    return res.status(200).json({ data: events, msg: "Events synced and fetched successfully" });
+     return res.status(200).json({ data: events, msg: "Events synced and fetched successfully" });
   } catch (error: any) {
-    console.error(error);
     return res.status(500).json({
       isLoggedIn: true,
       error: `Internal server error: ${error.message}`,
@@ -122,9 +156,10 @@ const get_events = async (req: Request, res: Response) => {
   }
 };
 
+
 const delete_event = async (req: Request, res: Response) => {
   try {
-    console.log("EVENT")
+
     const eventRepo = AppDataSource.getRepository(Event);
     const eventId = Number(req.params.eventId);
 

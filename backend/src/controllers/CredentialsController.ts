@@ -102,8 +102,11 @@ const register_user = async (req: Request, res: Response) => {
 
 const login_user = async (req: Request, res: Response) => {
   try {
+
+  
     const { email, password } = req.body;
     const failedValue = checkFaildInformation(req.body);
+   
 
     if (failedValue.length !== 0) {
       return res.status(400).json({
@@ -116,10 +119,11 @@ const login_user = async (req: Request, res: Response) => {
 
     // Load user along with roles and permissions
     const credential = await credentialsRepo.findOne({
-      where: { user: { email } },
+      where: { user: { email:email } },
       relations: ["user", "user.roles", "user.roles.permissions"],
     });
 
+    
     if (!credential) return res.status(401).json({ msg: "No account found with the provided email.", isLoggedIn: false });
 
     const user = credential.user;

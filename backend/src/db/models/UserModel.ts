@@ -56,6 +56,9 @@ export class User {
   @Column({ default: false })
   has_personal_calendar!: boolean; // <-- new field for all-day events
 
+  @Column({ nullable: true })
+  sort_order?: number;
+
   @CreateDateColumn()
   created_at!: Date;
 

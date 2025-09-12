@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/Api/store";
 import { selectUserById } from "@/Api/slices/User";
 import { uploadsUrl } from "@config/coreConfig";
+import hexToRgba from "@/utils/lighterColor";
 
 type props = {
   userId: number;
@@ -14,7 +15,7 @@ export default function SidebarUsers({ userId }: props) {
   const user = useSelector((state: RootState) => selectUserById(state, userId));
 
   return (
-    <div className={styles.sidebarUser}>
+    <div className={styles.userSidebar} style={{background:user  ? hexToRgba(user?.color, .2 ): "white"}}>
       <div className={styles.avatarContainer}>
         <Avatar
           src={user?.image ? `${uploadsUrl}${user.image}` : undefined} // only use src if image exists

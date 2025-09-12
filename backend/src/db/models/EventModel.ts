@@ -28,10 +28,11 @@ export class Event {
   location?: string;
 
   @Column({ default: false })
-  is_all_day!: boolean; // <-- new field for all-day events
+  is_all_day!: boolean; 
 
-  @Column({ default: false })
-  is_ms_event!: boolean; // <-- new field for all-day events
+ 
+  @Column({ type: "text", nullable: true })
+  event_type?: string;
 
   @CreateDateColumn()
   created_at!: Date;

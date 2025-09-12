@@ -24,14 +24,25 @@ interface EventDetailsProps {
   handleOpenEditEventModal: (eventId: number) => void;
 }
 
-export default function EventDetails({ eventId, handleOpenEditEventModal }: EventDetailsProps) {
+export default function EventDetails({
+  eventId,
+  handleOpenEditEventModal,
+}: EventDetailsProps) {
   const axiosInstance = useAxiosPrivate();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector(selectCredentialState);
-  const event = useSelector((state: RootState) => selectEventById(state, eventId));
+  const event = useSelector((state: RootState) =>
+    selectEventById(state, eventId)
+  );
 
   const handleDeleteEvent = (eventId: number) => {
-    dispatch(delete_event({ axiosInstance: axiosInstance, value: eventId, componentType: "delete_event_modal" }));
+    dispatch(
+      delete_event({
+        axiosInstance: axiosInstance,
+        value: eventId,
+        componentType: "delete_event_modal",
+      })
+    );
   };
 
   if (!event) {
@@ -43,8 +54,22 @@ export default function EventDetails({ eventId, handleOpenEditEventModal }: Even
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.header} style={{ background: `${event.color}/${10}` , width:"100%", margin:0, marginBottom:5}}>
-        <div className={styles.color} style={{ backgroundColor: event.color, border: `1px solid ${event.color}` }} />
+      <div
+        className={styles.header}
+        style={{
+          background: `${event.color}/${10}`,
+          width: "100%",
+          margin: 0,
+          marginBottom: 5,
+        }}
+      >
+        <div
+          className={styles.color}
+          style={{
+            backgroundColor: event.color,
+            border: `1px solid ${event.color}`,
+          }}
+        />
         <h2 className={styles.title}>
           {event.title} (
           <span title="Project Manager" style={{ color: event.color }}>
@@ -58,7 +83,9 @@ export default function EventDetails({ eventId, handleOpenEditEventModal }: Even
         <span className={styles.label}>
           <MdDateRange />
         </span>
-        <span className={styles.value}>{dayjs(event.start).format("dddd, D, MMM YYYY")}</span>
+        <span className={styles.value}>
+          {dayjs(event.start).format("dddd, D, MMM YYYY")}
+        </span>
       </div>
 
       <div className={styles.detailRow}>
@@ -67,7 +94,8 @@ export default function EventDetails({ eventId, handleOpenEditEventModal }: Even
         </span>
         <span className={styles.value}>
           <strong>
-            {dayjs(event.start).format("HH:mm")} - {dayjs(event.end).format("HH:mm")}
+            {dayjs(event.start).format("HH:mm")} -{" "}
+            {dayjs(event.end).format("HH:mm")}
           </strong>
         </span>
       </div>
@@ -89,7 +117,15 @@ export default function EventDetails({ eventId, handleOpenEditEventModal }: Even
           <span className={styles.value}>
             {event.helpers.map((helper) => {
               return (
-                <span key={helper.id} style={{ border: `1px solid ${event.color}`, borderRadius: "5px", margin: 1, padding: "0px 2px" }}>
+                <span
+                  key={helper.id}
+                  style={{
+                    border: `1px solid ${event.color}`,
+                    borderRadius: "5px",
+                    margin: 1,
+                    padding: "0px 2px",
+                  }}
+                >
                   {helper.first_name}
                 </span>
               );
@@ -102,7 +138,10 @@ export default function EventDetails({ eventId, handleOpenEditEventModal }: Even
           <span className={styles.label}>
             <PiNotebookFill />
           </span>
-          <span className={styles.value}>{event.description}</span>
+          <div
+            className={styles.eventDesc}
+            dangerouslySetInnerHTML={{ __html: event.description }}
+          />
         </div>
       )}
 
@@ -111,14 +150,27 @@ export default function EventDetails({ eventId, handleOpenEditEventModal }: Even
           <span className={styles.label}>
             <LuNotebookPen />
           </span>
-          <span className={styles.value} style={{ background: hexToRgba(event.color, 0.5), border: `1px solid ${event.color}`, padding: "0 2px", borderRadius: "4px", color: "black" }}>
+          <span
+            className={styles.value}
+            style={{
+              background: hexToRgba(event.color, 0.5),
+              border: `1px solid ${event.color}`,
+              padding: "0 2px",
+              borderRadius: "4px",
+              color: "black",
+            }}
+          >
             {event.note}
           </span>
         </div>
       )}
 
       <div className={styles.buttonRow}>
-        <Button size="xs" onClick={() => handleOpenEditEventModal(event.id)} disabled={!canEdit}>
+        <Button
+          size="xs"
+          onClick={() => handleOpenEditEventModal(event.id)}
+          disabled={!canEdit}
+        >
           Edit
         </Button>
 

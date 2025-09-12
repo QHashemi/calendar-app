@@ -19,6 +19,8 @@ export const Events = () => {
   const dispatch = useDispatch<AppDispatch>();
   const events = useSelector(selectEvents);
   const users = useSelector(selectUsers);
+
+
   const { user, accessToken } = useSelector(selectCredentialState);
   const axiosInstance = useAxiosPrivate();
 
@@ -116,7 +118,7 @@ export const Events = () => {
     );
   });
 
-  const rows = filteredEvents.map((event) => {
+  const rows = filteredEvents.filter(event=> event.event_type === "work_event").map((event) => {
     const canEdit = can(user, "edit:event", event);
     const canDelete = can(user, "delete:event", event);
 
