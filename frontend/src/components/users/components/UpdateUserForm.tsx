@@ -51,7 +51,7 @@ export default function UpdateUserForm({ closeModal, user }: UpdateUserFormProps
       extra_permissions: user.extra_permissions?.map((perm) => String(perm.id)) || [],
     },
   });
-  console.log(roles)
+
   useEffect(() => {
     if (componentType !== "update_user_modal") return;
     notifyMessage({
@@ -79,7 +79,7 @@ export default function UpdateUserForm({ closeModal, user }: UpdateUserFormProps
 
       if (closeModal) closeModal();
     } catch (err) {
-      console.error("Failed to update user:", err);
+      console.error("Benutzeraktualisierung fehlgeschlagen:", err);
     }
   };
 
@@ -88,45 +88,45 @@ export default function UpdateUserForm({ closeModal, user }: UpdateUserFormProps
       <form onSubmit={form.onSubmit(handleUpdateUser)}>
         <Stack gap="xs">
           <Title order={3} ta="center" size="xs">
-            Edit User
+            Benutzer bearbeiten
           </Title>
 
-          <Divider label="Personal Info" labelPosition="center" />
+          <Divider label="Persönliche Informationen" labelPosition="center" />
           <Group grow>
-            <TextInput size="xs" label="Title" placeholder="e.g. Mr, Ms, Dr" {...form.getInputProps("title")} />
-            <TextInput size="xs" label="First Name" placeholder="John" {...form.getInputProps("first_name")} required />
-            <TextInput size="xs" label="Last Name" placeholder="Doe" {...form.getInputProps("last_name")} required />
+            <TextInput size="xs" label="Anrede" placeholder="z.B. Herr, Frau, Dr" {...form.getInputProps("title")} />
+            <TextInput size="xs" label="Vorname" placeholder="Max" {...form.getInputProps("first_name")} required />
+            <TextInput size="xs" label="Nachname" placeholder="Mustermann" {...form.getInputProps("last_name")} required />
           </Group>
 
-          <TextInput size="xs" label="Email" placeholder="example@mail.com" type="email" {...form.getInputProps("email")} required />
+          <TextInput size="xs" label="E-Mail" placeholder="beispiel@mail.de" type="email" {...form.getInputProps("email")} required />
 
           <Divider label="Details" labelPosition="center" />
           <Group grow>
-            <ColorInput size="xs" label="Favorite Color" {...form.getInputProps("color")} />
+            <ColorInput size="xs" label="Lieblingsfarbe" {...form.getInputProps("color")} />
             <Select
               size="xs"
-              label="Gender"
-              placeholder="Select gender"
+              label="Geschlecht"
+              placeholder="Geschlecht auswählen"
               data={[
-                { value: "male", label: "Male" },
-                { value: "female", label: "Female" },
-                { value: "other", label: "Other" },
+                { value: "male", label: "Männlich" },
+                { value: "female", label: "Weiblich" },
+                { value: "other", label: "Andere" },
               ]}
               {...form.getInputProps("gender")}
               clearable
             />
-            <TextInput size="xs" label="Job" placeholder="Software Engineer" {...form.getInputProps("job")} />
+            <TextInput size="xs" label="Beruf" placeholder="Softwareentwickler" {...form.getInputProps("job")} />
           </Group>
 
-          <Switch size="xs" label="Has Personal Calendar" {...form.getInputProps("has_personal_calendar", { type: "checkbox" })} />
+          <Switch size="xs" label="Persönlicher Kalender aktiviert" {...form.getInputProps("has_personal_calendar", { type: "checkbox" })} />
 
-          <Divider label="Access Control" labelPosition="center" />
+          <Divider label="Zugriffsrechte" labelPosition="center" />
           {roles.length > 0 && permissions.length > 0 && (
             <>
               <MultiSelect
                 size="xs"
-                label="Roles"
-                placeholder="Select roles"
+                label="Rollen"
+                placeholder="Rollen auswählen"
                 data={roles.map((role) => ({ value: String(role.id), label: role.name }))}
                 value={form.values.roles}
                 onChange={(val) => form.setFieldValue("roles", val)}
@@ -136,8 +136,8 @@ export default function UpdateUserForm({ closeModal, user }: UpdateUserFormProps
 
               <MultiSelect
                 size="xs"
-                label="Extra Permissions"
-                placeholder="Select extra permissions"
+                label="Zusätzliche Berechtigungen"
+                placeholder="Berechtigungen auswählen"
                 data={permissions.map((perm) => ({ value: String(perm.id), label: perm.name }))}
                 value={form.values.extra_permissions}
                 onChange={(val) => form.setFieldValue("extra_permissions", val)}
@@ -149,10 +149,10 @@ export default function UpdateUserForm({ closeModal, user }: UpdateUserFormProps
 
           <Group mt="xs" justify="right">
             <Button size="xs" variant="default" onClick={closeModal}>
-              Cancel
+              Abbrechen
             </Button>
             <Button size="xs" type="submit">
-              Save Changes
+              Änderungen speichern
             </Button>
           </Group>
         </Stack>

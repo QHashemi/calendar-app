@@ -24,29 +24,29 @@ export function SidebarNavbar() {
   const pathname = usePathname();
   const [active, setActive] = useState<string>("");
 
-  // Load components
+  // Komponenten laden
   useEffect(() => {
     dispatch(get_components({ axiosInstance, componentType: "get_components" }));
   }, [dispatch, axiosInstance]);
 
-  // Update active link
+  // Aktives Element setzen
   useEffect(() => {
     const current = components.find((c) => `/applayout/${c.name.toLowerCase()}` === pathname);
     setActive(current ? current.name : "");
   }, [components, pathname]);
 
-  // Logout
+  // Abmelden
   const handleLogoutUser = async () => {
     try {
       await dispatch(logout_user({ componentType: "logout_user" })).unwrap();
     } catch (err) {
-      console.error("Logout failed", err);
+      console.error("Logout fehlgeschlagen", err);
     } finally {
       router.replace("/login");
     }
   };
 
-  // Map component names to icons
+  // Icons zuordnen
   const iconMap: Record<string, any> = {
     profile: IconUser,
     dashboard: IconLayoutDashboard,
@@ -56,7 +56,7 @@ export function SidebarNavbar() {
     settings: IconSettings,
   };
 
-  // Render menu links
+  // Menülinks rendern
   const menus = useMemo(() => {
     if (!user || !user.roles) return [];
 
@@ -71,7 +71,13 @@ export function SidebarNavbar() {
         const Icon = iconMap[component.name.toLowerCase()] || IconLayoutDashboard;
 
         return (
-          <Link key={component.id} href={`/applayout/${component.name.toLowerCase()}`} className={classes.link} data-active={component.name === active || undefined} prefetch={false}>
+          <Link
+            key={component.id}
+            href={`/applayout/${component.name.toLowerCase()}`}
+            className={classes.link}
+            data-active={component.name === active || undefined}
+            prefetch={false}
+          >
             <Icon className={classes.linkIcon} stroke={1.5} />
             <span>{component.name}</span>
           </Link>
@@ -84,16 +90,16 @@ export function SidebarNavbar() {
       <div className={classes.navbarMain}>
         <Group className={classes.header} justify="space-arround">
           <Avatar
-            src={user?.image ? `${uploadsUrl}${user.image}` : undefined} // only use src if image exists
+            src={user?.image ? `${uploadsUrl}${user.image}` : undefined}
             color={user?.color}
-            alt="Profile Image"
+            alt="Profilbild"
             radius="50%"
             size={35}
-            name={user?.display_name} // will be displayed if src is undefined
+            name={user?.display_name}
           />
           <Stack gap={0} justify="center">
             <Text c="white" size="sm">
-              {user ? `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim() : "Guest User"}
+              {user ? `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim() : "Gastbenutzer"}
             </Text>
             <Text c="white" size="xs">
               {user?.job}
@@ -102,14 +108,18 @@ export function SidebarNavbar() {
         </Group>
 
         <PersistLogin>
-          <Divider my="md" label={<h1 style={{ color: "white" }}>Main</h1>} />
+          <Divider my="md" label={<h1 style={{ color: "white" }}>Hauptmenü</h1>} />
           {menus}
 
-          <Divider my="md" label={<h1 style={{ color: "white" }}>Extra</h1>} />
+          <Divider my="md" label={<h1 style={{ color: "white" }}>Extras</h1>} />
 
-          <button onClick={handleLogoutUser} className={classes.link} style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
+          <button
+            onClick={handleLogoutUser}
+            className={classes.link}
+            style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+          >
             <IconLogout className={classes.linkIcon} stroke={1.5} />
-            <span>Logout</span>
+            <span>Abmelden</span>
           </button>
         </PersistLogin>
       </div>

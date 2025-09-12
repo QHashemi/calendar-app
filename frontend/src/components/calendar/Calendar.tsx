@@ -13,6 +13,10 @@ import { selectCredentialState } from "@/Api/slices/CredentialsSlice";
 import { get_event } from "@/Api/slices/EventSlice";
 import { get_user } from "@/Api/slices/User";
 
+import "dayjs/locale/de"; // import German locale
+
+dayjs.locale("de");
+
 export default function Calendar() {
   const dispatch = useDispatch<AppDispatch>();
   const axiosInstance = useAxiosPrivate();
@@ -24,8 +28,12 @@ export default function Calendar() {
 
   useEffect(() => {
     if (accessToken) {
-      dispatch(get_event({ axiosInstance, componentType: "calendar_week_page" }));
-      dispatch(get_user({ axiosInstance, componentType: "calendar_week_user" }));
+      dispatch(
+        get_event({ axiosInstance, componentType: "calendar_week_page" })
+      );
+      dispatch(
+        get_user({ axiosInstance, componentType: "calendar_week_user" })
+      );
     }
   }, [dispatch, accessToken]);
 

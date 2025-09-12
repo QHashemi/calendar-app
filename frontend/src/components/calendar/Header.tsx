@@ -1,16 +1,18 @@
+"use client";
+
 import dayjs from "dayjs";
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./Calendar.module.scss";
-import { Button, Switch } from "@mantine/core"; // ✅ import Switch
+import { Button, Switch } from "@mantine/core";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-type props = {
+type Props = {
   setWeekStartDate: React.Dispatch<React.SetStateAction<dayjs.Dayjs>>;
   weekStartDate: dayjs.Dayjs;
   calendarType: string;
   setCalendarType: React.Dispatch<React.SetStateAction<string>>;
-  showWeekend: boolean; // ✅ new prop
-  setShowWeekend: React.Dispatch<React.SetStateAction<boolean>>; // ✅ new prop
+  showWeekend: boolean;
+  setShowWeekend: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function Header({
@@ -20,7 +22,7 @@ export default function Header({
   setCalendarType,
   showWeekend,
   setShowWeekend,
-}: props) {
+}: Props) {
   const handleNextWeek = () => {
     setWeekStartDate((prev) => prev.add(1, "week"));
   };
@@ -46,6 +48,7 @@ export default function Header({
   );
 
   const calendarButtonRef = useRef<HTMLDivElement>(null);
+
   const handleWeekCalendar = (
     e: React.MouseEvent<HTMLButtonElement>,
     calendarType: string
@@ -62,7 +65,7 @@ export default function Header({
 
     switch (calendarType) {
       case "month":
-        setTitleValue(`Monat ${weekStartDate.format("MMMM")}`);
+        setTitleValue(`Monat: ${weekStartDate.format("MMMM")}`);
         setCalendarType("month");
         break;
       case "week":
@@ -70,7 +73,7 @@ export default function Header({
         setCalendarType("week");
         break;
       case "day":
-        setTitleValue(`Tag ${weekStartDate.format("dddd")}`);
+        setTitleValue(`Tag: ${weekStartDate.format("dddd")}`);
         setCalendarType("day");
         break;
     }
@@ -78,7 +81,7 @@ export default function Header({
 
   useEffect(() => {
     setTitleValue(`Woche ${weekStartDate.isoWeek()}`);
-  }, [handlePrevWeek, handleNextWeek]);
+  }, [weekStartDate]);
 
   return (
     <div className={styles.header}>
@@ -88,31 +91,32 @@ export default function Header({
           variant="filled"
           onClick={handlePrevWeek}
           rightSection={<FaChevronLeft />}
-        ></Button>
+        />
         <Button
           size="xs"
           variant="filled"
           onClick={handleNextWeek}
           rightSection={<FaChevronRight />}
-        ></Button>
+        />
       </div>
 
       <div className={styles.headerTitle}>{titleValue}</div>
 
       <div className={styles.headerRight} ref={calendarButtonRef}>
-        {/* ✅ Weekend Toggle */}
         <Switch
           size="sm"
-          onLabel="ON"
-          offLabel="OFF"
-          label="Show Weekend"
+          onLabel="Ja"
+          offLabel="Nein"
+          label="Wochenende anzeigen"
           checked={showWeekend}
           onChange={(e) => setShowWeekend(e.currentTarget.checked)}
           ml="md"
         />
+
         <Button variant="default" size="xs" onClick={handleToday}>
-          Today
+          Heute
         </Button>
+
         <Button
           disabled
           variant="filled"
@@ -120,7 +124,7 @@ export default function Header({
           data-title="month"
           onClick={(e) => handleWeekCalendar(e, "month")}
         >
-          Month
+          Monat
         </Button>
         <Button
           variant="filled"
@@ -128,7 +132,7 @@ export default function Header({
           data-title="week"
           onClick={(e) => handleWeekCalendar(e, "week")}
         >
-          Week
+          Woche
         </Button>
         <Button
           disabled
@@ -137,7 +141,7 @@ export default function Header({
           data-title="day"
           onClick={(e) => handleWeekCalendar(e, "day")}
         >
-          Day
+          Tag
         </Button>
       </div>
     </div>

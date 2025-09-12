@@ -6,17 +6,15 @@ import { useForm } from "@mantine/form";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/Api/store";
 import { login_user, selectCredentialState } from "@/Api/slices/CredentialsSlice";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { notifyMessage } from "@/helpers/notifyMessage";
-import showcaseImg from "@/assets/images/register.jpg"; // your illustration
+import showcaseImg from "@/assets/images/register.jpg";
 
 export default function LoginPage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const from = searchParams.get("from") || "/applayout/profile";
   const { isLoggedIn, componentType, msg, error } = useSelector(selectCredentialState);
-
+  const from = "/applayout/profile";
   const form = useForm({
     initialValues: { email: "", password: "" },
     validate: {
@@ -39,7 +37,7 @@ export default function LoginPage() {
   }, [componentType, msg, error, isLoggedIn, from, router]);
 
   const handleSubmit = async (values: typeof form.values) => {
-    await dispatch(login_user({ value: values, componentType: "login_user" }));
+    await dispatch(login_user({ value: values, componentType: "login_user"}));
   };
 
   return (
@@ -65,7 +63,7 @@ export default function LoginPage() {
           boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
         }}
       >
-        {/* Left illustration */}
+        {/* Linke Illustration */}
         <div
           style={{
             flex: "1 1 300px",
@@ -87,12 +85,12 @@ export default function LoginPage() {
               borderRadius: 12,
             }}
           >
-            <h2 style={{ marginBottom: 4 }}>Welcome Back</h2>
-            <p style={{ fontSize: "14px", margin: 0 }}>Sign in and continue to access!</p>
+            <h2 style={{ marginBottom: 4 }}>Willkommen zurück</h2>
+            <p style={{ fontSize: "14px", margin: 0 }}>Melde dich an, um fortzufahren!</p>
           </div>
         </div>
 
-        {/* Right form */}
+        {/* Rechtes Formular */}
         <div
           style={{
             flex: "1 1 300px",
@@ -117,10 +115,15 @@ export default function LoginPage() {
                 ref={emailRef}
                 {...form.getInputProps("email")}
               />
-              <PasswordInput size="xs" placeholder="Passwort" required {...form.getInputProps("password")} />
+              <PasswordInput
+                size="xs"
+                placeholder="Passwort"
+                required
+                {...form.getInputProps("password")}
+              />
 
               <Button size="xs" type="submit" fullWidth mt="xs">
-                Login
+                Einloggen
               </Button>
             </Stack>
           </form>

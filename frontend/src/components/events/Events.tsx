@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Table, Button, Modal, Group, ScrollArea, Paper, Title, Badge, Collapse, Text, TextInput, ColorInput, Textarea, MultiSelect, Select, Divider, Stack } from "@mantine/core";
+import { Table, Button, Modal, Group, ScrollArea, Paper, Title, Badge, Collapse, Text, TextInput, ColorInput, Textarea, MultiSelect, Select, Divider, Stack, ActionIcon } from "@mantine/core";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "@mantine/form";
 import { DateTimePicker } from "@mantine/dates";
 import dayjs from "dayjs";
-import { Search } from "lucide-react";
+import { Search, Trash } from "lucide-react";
 
 import { get_event, create_event, update_event, delete_event, selectEvents } from "../../Api/slices/EventSlice";
 import { selectUsers, get_user } from "@/Api/slices/User";
@@ -14,12 +14,12 @@ import { AppDispatch } from "@/Api/store";
 import useAxiosPrivate from "@/Api/useAxiosPrivate";
 import { UserType } from "../../types/UserTypes";
 import { can } from "@/helpers/policy";
+import DeleteButton from "@components/globalComponents/DeleteModal";
 
 export const Events = () => {
   const dispatch = useDispatch<AppDispatch>();
   const events = useSelector(selectEvents);
   const users = useSelector(selectUsers);
-
 
   const { user, accessToken } = useSelector(selectCredentialState);
   const axiosInstance = useAxiosPrivate();
@@ -27,12 +27,12 @@ export const Events = () => {
   const [opened, setOpened] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any>(null);
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
-  const [search, setSearch] = useState(""); // 🔹 search state
+  const [search, setSearch] = useState(""); // 🔹 Suchbegriff
 
   useEffect(() => {
     if (accessToken) {
       dispatch(get_event({ axiosInstance, componentType: "event_table" }));
-      dispatch(get_user({ axiosInstance, componentType: "get_user" })); // <-- make sure users are fetched
+      dispatch(get_user({ axiosInstance, componentType: "get_user" }));
     }
   }, []);
 
@@ -47,7 +47,7 @@ export const Events = () => {
       event_note: "",
       event_helpers: [] as string[],
       event_owner: "",
-      event_all_day: false, // <-- added
+      event_all_day: false,
     },
   });
 
@@ -106,7 +106,7 @@ export const Events = () => {
     setOpened(false);
   };
 
-  // 🔹 Filter events by search term
+  // 🔹 Filter nach Suchbegriff
   const filteredEvents = events.filter((event) => {
     const term = search.toLowerCase();
     return (
@@ -118,74 +118,89 @@ export const Events = () => {
     );
   });
 
-  const rows = filteredEvents.filter(event=> event.event_type === "work_event").map((event) => {
-    const canEdit = can(user, "edit:event", event);
-    const canDelete = can(user, "delete:event", event);
+  const rows = filteredEvents
+    .filter(event => event.event_type === "work_event")
+    .map((event) => {
+      const canEdit = can(user, "edit:event", event);
+      const canDelete = can(user, "delete:event", event);
 
-    return (
-      <React.Fragment key={event.id}>
-        <Table.Tr>
-          <Table.Td>
-            <Badge color={event.color}>{event.color}</Badge>
-          </Table.Td>
-          <Table.Td>{event.title}</Table.Td>
-          <Table.Td>{dayjs(event.start).format("DD MMM YYYY ,HH:mm")}</Table.Td>
-          <Table.Td>{dayjs(event.end).format("DD MMM YYYY ,HH:mm")}</Table.Td>
-          <Table.Td>{event.location || "-"}</Table.Td>
-          <Table.Td>{event.organizer.display_name}</Table.Td>
-          <Table.Td>{event.owner.display_name}</Table.Td>
+      return (
+        <React.Fragment key={event.id}>
+          <Table.Tr>
+            <Table.Td>
+              <Badge color={event.color}>{event.color}</Badge>
+            </Table.Td>
+            <Table.Td>{event.title}</Table.Td>
+            <Table.Td>{dayjs(event.start).format("DD MMM YYYY ,HH:mm")}</Table.Td>
+            <Table.Td>{dayjs(event.end).format("DD MMM YYYY ,HH:mm")}</Table.Td>
+            <Table.Td>{event.location || "-"}</Table.Td>
+            <Table.Td>{event.organizer.display_name}</Table.Td>
+            <Table.Td>{event.owner.display_name}</Table.Td>
 
-          <Table.Td>
-            <Group>
-              <Button size="xs" variant="light" onClick={() => setExpandedRow(expandedRow === event.id ? null : event.id)}>
-                {expandedRow === event.id ? "Hide Helpers" : "Show Helpers"}
-              </Button>
-              <Button size="xs" variant="outline" onClick={() => handleEdit(event)} disabled={!canEdit}>
-                Edit
-              </Button>
-              <Button size="xs" color="red" variant="outline" onClick={() => handleDelete(event.id)} disabled={!canDelete}>
-                Delete
-              </Button>
-            </Group>
-          </Table.Td>
-        </Table.Tr>
+            <Table.Td>
+              <Group>
+                <Button size="xs" variant="light" onClick={() => setExpandedRow(expandedRow === event.id ? null : event.id)}>
+                  {expandedRow === event.id ? "Helfer ausblenden" : "Helfer anzeigen"}
+                </Button>
+                <Button size="xs" variant="outline" onClick={() => handleEdit(event)} disabled={!canEdit}>
+                  Bearbeiten
+                </Button>
+                   {canDelete ? (
+                    <DeleteButton
+                    isButton
+                    size="xs"
+                    title="Ereignisse löschen!"
+                    buttonTitle="Löschen"
+                    deleteText="Sind Sie sicher, dass Sie diesen Ereignisse löschen möchten?"
+                    onConfirm={() => handleDelete(event.id)}
+                            
+                    />
+                  ) : (
+                    <ActionIcon variant="outline" disabled={!canDelete} color="red">
+                      <Trash size={15} />
+                    </ActionIcon>
+                  )}
 
-        {/* Collapse row */}
-        <Table.Tr>
-          <Table.Td colSpan={8} style={{ padding: 0, border: "none" }}>
-            <Collapse in={expandedRow === event.id}>
-              <Paper p="sm" withBorder shadow="xs">
-                {event.helpers && event.helpers.length > 0 ? (
-                  <Group>
-                    {event.helpers.map((helper: UserType) => (
-                      <Badge key={helper.id} color="blue" variant="light">
-                        {helper.display_name || helper.first_name}
-                      </Badge>
-                    ))}
-                  </Group>
-                ) : (
-                  <Text size="sm" c="dimmed">
-                    No helpers assigned
-                  </Text>
-                )}
-              </Paper>
-            </Collapse>
-          </Table.Td>
-        </Table.Tr>
-      </React.Fragment>
-    );
-  });
+              </Group>
+            </Table.Td>
+          </Table.Tr>
+
+          {/* Collapse-Zeile */}
+          <Table.Tr>
+            <Table.Td colSpan={8} style={{ padding: 0, border: "none" }}>
+              <Collapse in={expandedRow === event.id}>
+                <Paper p="sm" withBorder shadow="xs">
+                  {event.helpers && event.helpers.length > 0 ? (
+                    <Group>
+                      {event.helpers.map((helper: UserType) => (
+                        <Badge key={helper.id} color="blue" variant="light">
+                          {helper.display_name || helper.first_name}
+                        </Badge>
+                      ))}
+                    </Group>
+                  ) : (
+                    <Text size="sm" c="dimmed">
+                      Keine Helfer zugewiesen
+                    </Text>
+                  )}
+                </Paper>
+              </Collapse>
+            </Table.Td>
+          </Table.Tr>
+        </React.Fragment>
+      );
+    });
 
   const canAdd = can(user, "add:event", {});
   return (
     <ScrollArea p="md">
       <Group mb="xs" justify="space-between">
-        <Title order={3}>Events</Title>
+        <Title order={3}>Ereignisse</Title>
         <Group>
-          {/* 🔹 Search bar */}
-          <TextInput size="xs" placeholder="Search events..." value={search} onChange={(e) => setSearch(e.currentTarget.value)} leftSection={<Search size={14} />} />
+          {/* 🔹 Suchfeld */}
+          <TextInput size="xs" placeholder="Ereignisse suchen..." value={search} onChange={(e) => setSearch(e.currentTarget.value)} leftSection={<Search size={14} />} />
           <Button size="xs" onClick={handleAdd} disabled={!canAdd}>
-            Add Event
+            Neues Ereignis
           </Button>
         </Group>
       </Group>
@@ -194,51 +209,51 @@ export const Events = () => {
         <Table striped withTableBorder withColumnBorders highlightOnHover>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>Color</Table.Th>
-              <Table.Th>Title</Table.Th>
+              <Table.Th>Farbe</Table.Th>
+              <Table.Th>Titel</Table.Th>
               <Table.Th>Start</Table.Th>
-              <Table.Th>End</Table.Th>
-              <Table.Th>Location</Table.Th>
-              <Table.Th>Organizer</Table.Th>
-              <Table.Th>Employee</Table.Th>
-              <Table.Th>Actions</Table.Th>
+              <Table.Th>Ende</Table.Th>
+              <Table.Th>Ort</Table.Th>
+              <Table.Th>Organisator</Table.Th>
+              <Table.Th>Mitarbeiter</Table.Th>
+              <Table.Th>Aktionen</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
       </ScrollArea>
 
-      {/* Modal for Add/Edit */}
-      <Modal opened={opened} onClose={() => setOpened(false)} title={editingEvent ? "Edit Event" : "Add Event"} size="lg">
+      {/* Modal für Hinzufügen/Bearbeiten */}
+      <Modal opened={opened} onClose={() => setOpened(false)} title={editingEvent ? "Ereignis bearbeiten" : "Neues Ereignis"} size="lg">
         <Paper shadow="md" p="md" radius="md" withBorder>
           <form onSubmit={form.onSubmit(handleSubmit)}>
             <Stack gap="xs">
-              <Title order={3} ta="center" >
-                {editingEvent ? "Edit Event" : "Add New Event"}
+              <Title order={3} ta="center">
+                {editingEvent ? "Ereignis bearbeiten" : "Neues Ereignis"}
               </Title>
 
-              <Divider label="Event Info" labelPosition="center" />
+              <Divider label="Ereignisinformationen" labelPosition="center" />
 
-              <TextInput size="xs" label="Event Name" placeholder="Enter event name" withAsterisk {...form.getInputProps("event_name")} />
+              <TextInput size="xs" label="Name des Ereignisses" placeholder="Ereignisname eingeben" withAsterisk {...form.getInputProps("event_name")} />
 
               <Group grow>
                 <Select
                   size="xs"
-                  label="Owner"
-                  placeholder="Select owner"
+                  label="Mitarbeiter"
+                  placeholder="Mitarbeiter auswählen"
                   data={users.map((u) => ({
                     value: String(u.id),
                     label: u.display_name || u.first_name,
                   }))}
                   {...form.getInputProps("event_owner")}
                 />
-                <ColorInput size="xs" label="Event Color" placeholder="Select color" {...form.getInputProps("event_color")} />
+                <ColorInput size="xs" label="Farbe" placeholder="Farbe auswählen" {...form.getInputProps("event_color")} />
               </Group>
 
               <MultiSelect
                 size="xs"
-                label="Helpers"
-                placeholder="Select helpers"
+                label="Helfer"
+                placeholder="Helfer auswählen"
                 data={users.map((u) => ({
                   value: String(u.id),
                   label: u.display_name || u.first_name,
@@ -248,13 +263,13 @@ export const Events = () => {
                 clearable
               />
 
-              <Divider label="Timing" labelPosition="center" />
+              <Divider label="Zeitplanung" labelPosition="center" />
 
               <Group grow>
                 <DateTimePicker
                   size="xs"
-                  label="Start Date"
-                  placeholder="Pick start date"
+                  label="Startdatum"
+                  placeholder="Startdatum wählen"
                   valueFormat="DD-MM-YYYY, HH:mm"
                   {...form.getInputProps("event_start")}
                   timePickerProps={{
@@ -266,8 +281,8 @@ export const Events = () => {
                 />
                 <DateTimePicker
                   size="xs"
-                  label="End Date"
-                  placeholder="Pick end date"
+                  label="Enddatum"
+                  placeholder="Enddatum wählen"
                   valueFormat="DD-MM-YYYY, HH:mm"
                   {...form.getInputProps("event_end")}
                   timePickerProps={{
@@ -279,18 +294,18 @@ export const Events = () => {
                 />
               </Group>
 
-              <TextInput size="xs" label="Location" placeholder="Event location" {...form.getInputProps("event_location")} />
+              <TextInput size="xs" label="Ort" placeholder="Ort des Ereignisses" {...form.getInputProps("event_location")} />
 
-              <Textarea size="xs" label="Description" placeholder="Enter description" autosize minRows={2} {...form.getInputProps("event_description")} />
+              <Textarea size="xs" label="Beschreibung" placeholder="Beschreibung eingeben" autosize minRows={2} {...form.getInputProps("event_description")} />
 
-              <Textarea size="xs" label="Notes" placeholder="Additional notes" autosize minRows={2} {...form.getInputProps("event_note")} />
+              <Textarea size="xs" label="Notizen" placeholder="Zusätzliche Notizen" autosize minRows={2} {...form.getInputProps("event_note")} />
 
               <Group justify="right" mt="xs">
                 <Button size="xs" variant="default" onClick={() => setOpened(false)}>
-                  Cancel
+                  Abbrechen
                 </Button>
                 <Button size="xs" type="submit">
-                  {editingEvent ? "Update Event" : "Create Event"}
+                  {editingEvent ? "Ereignis aktualisieren" : "Ereignis erstellen"}
                 </Button>
               </Group>
             </Stack>

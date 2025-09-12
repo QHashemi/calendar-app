@@ -26,11 +26,11 @@ export default function ConfirmDelete({
 
       <Popover.Dropdown>
         <Text size="sm" mb="xs">
-          {message || "Are you sure you want to delete this item?"}
+          {message || "Möchten Sie dieses Element wirklich löschen?"}
         </Text>
         <Group justify="right">
           <Button size="xs" variant="default" onClick={() => setOpened(false)}>
-            Cancel
+            Abbrechen
           </Button>
           <Button
             size="xs"
@@ -40,7 +40,7 @@ export default function ConfirmDelete({
               setOpened(false);
             }}
           >
-            Delete
+            Löschen
           </Button>
         </Group>
       </Popover.Dropdown>

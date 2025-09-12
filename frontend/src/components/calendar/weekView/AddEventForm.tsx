@@ -73,7 +73,7 @@ export default function AddEvent({
     >
       <TextInput
         withAsterisk
-        placeholder="Event Name"
+        placeholder="Eventname"
         {...form.getInputProps("event_name")}
         size="xs"
         style={{ marginBottom: "5px" }}
@@ -82,7 +82,7 @@ export default function AddEvent({
 
       <ColorInput
         {...form.getInputProps("event_color")}
-        placeholder="Select color"
+        placeholder="Farbe auswählen"
         size="xs"
         mb="xs"
         required
@@ -90,39 +90,44 @@ export default function AddEvent({
 
       {/* Jodit Editor for Event Description */}
       <div style={{ marginBottom: "8px" }}>
-      <Editor value={description} onChange={setDescription} height={100} placeholder="Enter description..." />
+        <Editor
+          value={description}
+          onChange={setDescription}
+          height={100}
+          placeholder="Beschreibung eingeben..."
+        />
       </div>
 
-      <div className={styles.detailRow}>
-        <span className={styles.label}>
-          <MdDateRange />
-        </span>
-        <span className={styles.value}>
-          {dayjs(start).format("dddd, D, MMM YYYY")}
-        </span>
-      </div>
+     <div className={styles.detailRow}>
+      <span className={styles.label}>
+        <MdDateRange />
+      </span>
+      <span className={styles.value}>
+        {dayjs(start).format("dddd, D. MMM YYYY")}
+      </span>
+    </div>
 
-      <div className={styles.detailRow}>
-        <span className={styles.label}>
-          <IoTimeOutline />
-        </span>
-        <span className={styles.value}>
-          <strong>
-            {dayjs(start).format("HH:mm")} - {dayjs(end).format("HH:mm")}
-          </strong>
-        </span>
-      </div>
+     <div className={styles.detailRow}>
+      <span className={styles.label}>
+        <IoTimeOutline />
+      </span>
+      <span className={styles.value}>
+        <strong>
+          {dayjs(start).format("HH:mm")} - {dayjs(end).format("HH:mm")}
+        </strong>
+      </span>
+    </div>
 
       <Group justify="space-between" mt="md">
-        <Button
+         <Button
           size="xs"
           variant="default"
           onClick={() => handleOpenDetailsForm(start, end, userId)}
         >
-          More Details
+          Weitere Details
         </Button>
         <Button size="xs" type="submit">
-          Submit
+          Speichern
         </Button>
       </Group>
     </form>

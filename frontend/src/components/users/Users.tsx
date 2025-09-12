@@ -110,18 +110,18 @@ function SortableRow({
             onPointerDown={(e) => e.stopPropagation()}
 
           >
-            Edit
+            Bearbeiten
           </Button>
 
           {canDelete ? (
             <DeleteButton
-              isButton
-              size="xs"
-              title="Delete User!"
-              buttonTitle="Delete"
-              deleteText="Are you sure you want to delete this user?"
-              onConfirm={() => handleDeleteUser(user.id)}
-             
+            isButton
+            size="xs"
+            title="Benutzer löschen!"
+            buttonTitle="Löschen"
+            deleteText="Sind Sie sicher, dass Sie diesen Benutzer löschen möchten?"
+            onConfirm={() => handleDeleteUser(user.id)}
+                    
             />
           ) : (
             <ActionIcon variant="outline" disabled={!canDelete} color="red">
@@ -258,18 +258,19 @@ export default function Users() {
       />
 
       <Group justify="space-between" mb="sm">
-        <Text size="lg" fw={600}>
-          Users List
-        </Text>
-        <Group>
-          {selectedIds.length > 0 && (
-            <Button color="red">Delete Selected ({selectedIds.length})</Button>
-          )}
-          <Button size="xs" onClick={handleCreateUser} disabled={!canAdd}>
-            Create User
-          </Button>
-        </Group>
+      <Text size="lg" fw={600}>
+        Benutzerliste
+      </Text>
+      <Group>
+        {selectedIds.length > 0 && (
+          <Button color="red">Ausgewählte löschen ({selectedIds.length})</Button>
+        )}
+        <Button size="xs" onClick={handleCreateUser} disabled={!canAdd}>
+          Benutzer erstellen
+        </Button>
       </Group>
+    </Group>
+
 
       <ScrollArea>
         <DndContext
@@ -281,34 +282,34 @@ export default function Users() {
             items={pageUsers.map((u) => u.id)}
             strategy={verticalListSortingStrategy}
           >
-            <Table striped withTableBorder withColumnBorders highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>
-                    <Checkbox onChange={toggleSelectAll} />
-                  </Table.Th>
-                  <Table.Th>Name</Table.Th>
-                  <Table.Th>Email</Table.Th>
-                  <Table.Th>Own Calendar</Table.Th>
-                  <Table.Th>Order</Table.Th>
-                  <Table.Th>Job</Table.Th>
-                  <Table.Th>Actions</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {pageUsers.map((user) => (
-                  <SortableRow
-                    key={user.id}
-                    user={user}
-                    selectedIds={selectedIds}
-                    toggleSelect={toggleSelect}
-                    handleUpdateUser={handleUpdateUser}
-                    handleDeleteUser={handleDeleteUser}
-                    loggedUser={loggedUser}
-                  />
-                ))}
-              </Table.Tbody>
-            </Table>
+     <Table striped withTableBorder withColumnBorders highlightOnHover>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>
+              <Checkbox onChange={toggleSelectAll} />
+            </Table.Th>
+            <Table.Th>Name</Table.Th>
+            <Table.Th>E-Mail</Table.Th>
+            <Table.Th>Persönlicher Kalender</Table.Th>
+            <Table.Th>Reihenfolge</Table.Th>
+            <Table.Th>Beruf</Table.Th>
+            <Table.Th>Aktionen</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {pageUsers.map((user) => (
+            <SortableRow
+              key={user.id}
+              user={user}
+              selectedIds={selectedIds}
+              toggleSelect={toggleSelect}
+              handleUpdateUser={handleUpdateUser}
+              handleDeleteUser={handleDeleteUser}
+              loggedUser={loggedUser}
+            />
+          ))}
+        </Table.Tbody>
+      </Table>
           </SortableContext>
         </DndContext>
       </ScrollArea>

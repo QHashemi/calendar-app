@@ -96,25 +96,26 @@ export default function AddDetailsEventForm({
 
           <Divider label="Event Info" labelPosition="center" my="xs" />
 
-          <TextInput
-            label="Event Name"
-            placeholder="Enter Event Name"
+         <TextInput
+            label="Eventname"
+            placeholder="Geben Sie den Eventnamen ein"
             withAsterisk
             size="xs"
             {...form.getInputProps("event_name")}
           />
 
           <ColorInput
-            label="Event Color"
-            placeholder="Select color"
+            label="Eventfarbe"
+            placeholder="Farbe auswählen"
             size="xs"
             {...form.getInputProps("event_color")}
             required
           />
 
+      
           <MultiSelect
-            label="Helpers"
-            placeholder="Select helpers"
+            label="Helfer"
+            placeholder="Helfer auswählen"
             size="xs"
             data={users.map((u) => ({
               value: String(u.id),
@@ -126,9 +127,9 @@ export default function AddDetailsEventForm({
           />
 
           <Group grow gap="xs">
-            <DateTimePicker
-              label="Start Date"
-              placeholder="Select start"
+           <DateTimePicker
+              label="Startdatum"
+              placeholder="Start auswählen"
               valueFormat="DD-MM-YYYY, HH:mm"
               size="xs"
               {...form.getInputProps("event_start")}
@@ -139,9 +140,10 @@ export default function AddDetailsEventForm({
                 minutesStep: 30,
               }}
             />
+
             <DateTimePicker
-              label="End Date"
-              placeholder="Select end"
+              label="Enddatum"
+              placeholder="Ende auswählen"
               valueFormat="DD-MM-YYYY, HH:mm"
               size="xs"
               {...form.getInputProps("event_end")}
@@ -154,29 +156,29 @@ export default function AddDetailsEventForm({
             />
           </Group>
 
+        
           <TextInput
-            label="Location"
-            placeholder="Event location"
+            label="Ort"
+            placeholder="Eventort"
             size="xs"
             {...form.getInputProps("event_location")}
           />
-
           {/* Jodit Editor for Description */}
           <div>
-            <label style={{ fontSize: 12 }}>Description</label>
+            <label style={{ fontSize: 12 }}>Beschreibung</label>
             <Editor
               value={description}
               onChange={setDescription}
               height={100}
-              placeholder="Enter description..."
+              placeholder="Beschreibung eingeben..."
             />
           </div>
 
           {/* Jodit Editor for Notes */}
           <div>
-            <Textarea
-              label="Notes"
-              placeholder="Additional notes"
+           <Textarea
+              label="Notizen"
+              placeholder="Zusätzliche Notizen"
               size="xs"
               autosize
               minRows={2}
@@ -186,10 +188,10 @@ export default function AddDetailsEventForm({
 
           <Group mt="sm" gap="xs" justify="right">
             <Button size="xs" variant="default" onClick={closeModal}>
-              Cancel
+              Abbrechen
             </Button>
             <Button size="xs" type="submit">
-              Save Event
+              Event speichern
             </Button>
           </Group>
         </Stack>

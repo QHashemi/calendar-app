@@ -6,9 +6,11 @@ import { FaCheckCircle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import useAxiosPrivate from "@/Api/useAxiosPrivate";
 import { AppDispatch } from "@/Api/store";
-import { resetCredentialComponentType, selectCredentialState, update_password } from "@/Api/slices/CredentialsSlice";
-import { showNotification } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import {
+  resetCredentialComponentType,
+  selectCredentialState,
+  update_password,
+} from "@/Api/slices/CredentialsSlice";
 import { notifyMessage } from "@/helpers/notifyMessage";
 
 export default function PasswordMGT({ userId }: { userId: number }) {
@@ -16,6 +18,7 @@ export default function PasswordMGT({ userId }: { userId: number }) {
   const axiosInstance = useAxiosPrivate();
 
   const { componentType, msg, error } = useSelector(selectCredentialState);
+
   const form = useForm({
     initialValues: {
       current_password: "",
@@ -26,14 +29,13 @@ export default function PasswordMGT({ userId }: { userId: number }) {
 
   const [password, setPassword] = useState("");
 
-  // Validation rules
+  // Passwortvalidierung
   const hasMinLength = password.length >= 12;
   const hasUppercase = /[A-Z]/.test(password);
   const hasLowercase = /[a-z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
-  // Keep password in sync for validation
   useEffect(() => {
     setPassword(form.values.new_password);
   }, [form.values.new_password]);
@@ -53,10 +55,17 @@ export default function PasswordMGT({ userId }: { userId: number }) {
   const handleUpdateCredential = async (values: typeof form.values) => {
     try {
       if (hasMinLength && hasUppercase && hasLowercase && hasNumber && hasSpecialChar) {
-        await dispatch(update_password({ axiosInstance, value: values, id: userId, componentType: "update_password_form" }));
+        await dispatch(
+          update_password({
+            axiosInstance,
+            value: values,
+            id: userId,
+            componentType: "update_password_form",
+          })
+        );
       }
     } catch (error) {
-      console.error("Failed to update password", error);
+      console.error("Fehler beim Aktualisieren des Passworts", error);
     }
   };
 
@@ -64,35 +73,74 @@ export default function PasswordMGT({ userId }: { userId: number }) {
     <Box>
       <form onSubmit={form.onSubmit(handleUpdateCredential)}>
         <Stack>
-          <Title order={3}>Change Password</Title>
+          <Title order={3}>Passwort ändern</Title>
           <Divider />
 
-          <TextInput label="Current Password" type="password" autoComplete="current_password" required {...form.getInputProps("current_password")} />
+          <TextInput
+            label="Aktuelles Passwort"
+            type="password"
+            autoComplete="current_password"
+            required
+            {...form.getInputProps("current_password")}
+          />
 
-          <TextInput label="New Password" type="password" required autoComplete="new_password" {...form.getInputProps("new_password")} />
+          <TextInput
+            label="Neues Passwort"
+            type="password"
+            required
+            autoComplete="new_password"
+            {...form.getInputProps("new_password")}
+          />
 
-          <List size="sm" withPadding type="unordered" spacing="xs" style={{ listStyleType: "disc" }}>
+          <List
+            size="sm"
+            withPadding
+            type="unordered"
+            spacing="xs"
+            style={{ listStyleType: "disc" }}
+          >
             <List.Item>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{hasMinLength ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} Minimum 12 characters</span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                {hasMinLength ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} 
+                Mindestens 12 Zeichen
+              </span>
             </List.Item>
             <List.Item>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{hasUppercase ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} One uppercase character</span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                {hasUppercase ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} 
+                Mindestens ein Großbuchstabe
+              </span>
             </List.Item>
             <List.Item>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{hasLowercase ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} One lowercase character</span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                {hasLowercase ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} 
+                Mindestens ein Kleinbuchstabe
+              </span>
             </List.Item>
             <List.Item>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{hasSpecialChar ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} One special character</span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                {hasSpecialChar ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} 
+                Mindestens ein Sonderzeichen
+              </span>
             </List.Item>
             <List.Item>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}> {hasNumber ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} One number </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                {hasNumber ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} 
+                Mindestens eine Zahl
+              </span>
             </List.Item>
           </List>
 
-          <TextInput label="Confirm Password" type="password" required autoComplete="confirm_password" {...form.getInputProps("confirm_password")} />
+          <TextInput
+            label="Passwort bestätigen"
+            type="password"
+            required
+            autoComplete="confirm_password"
+            {...form.getInputProps("confirm_password")}
+          />
 
           <Button fullWidth type="submit">
-            Update Password
+            Passwort aktualisieren
           </Button>
         </Stack>
       </form>

@@ -25,6 +25,7 @@ let initialState: InitialState = {
     image: "",
     extra_permissions: [],
     has_personal_calendar: false,
+    sort_order: 0,
   },
   isLoggedIn: false,
   resStatus: "",
@@ -34,6 +35,7 @@ let initialState: InitialState = {
   error: null,
   accessToken: "",
   persist: false,
+
 };
 
 // Create user thunk

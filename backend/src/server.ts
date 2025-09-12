@@ -14,7 +14,7 @@ import { ComponentRoutes } from "./routers/ComponentRoutes";
 import { seedRolesPermissionsAndComponents } from "./seed-roles-permissions";
 
 const app = express();
-const PORT = 4000;
+const PORT = 5000;
 
 dotenv.config();
 

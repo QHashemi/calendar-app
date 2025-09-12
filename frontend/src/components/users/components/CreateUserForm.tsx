@@ -78,10 +78,10 @@ export default function CreateUserForm({ closeModal }: CreateUserFormProps) {
       const passwordsMatch = password === confirmPassword;
 
       if (!hasMinLength || !hasUppercase || !hasLowercase || !hasNumber || !hasSpecialChar) {
-        return notifyMessage({ msg: "Password does not meet criteria", error: true });
+        return notifyMessage({ msg: "Das Passwort erfüllt nicht die Kriterien", error: true });
       }
       if (!passwordsMatch) {
-        return notifyMessage({ msg: "Passwords do not match", error: true });
+        return notifyMessage({ msg: "Passwörter stimmen nicht überein", error: true });
       }
     }
 
@@ -89,11 +89,10 @@ export default function CreateUserForm({ closeModal }: CreateUserFormProps) {
       await dispatch(create_user({ axiosInstance, value: values, componentType: "refresh_accocreate_user" })).unwrap();
       if (closeModal) closeModal();
     } catch (err) {
-      console.error("Failed to create user:", err);
+      console.error("Benutzer konnte nicht erstellt werden:", err);
     }
   };
 
-  // password validations
   const password = form.values.password;
   const hasMinLength = password.length >= 12;
   const hasUppercase = /[A-Z]/.test(password);
@@ -107,87 +106,85 @@ export default function CreateUserForm({ closeModal }: CreateUserFormProps) {
       <form onSubmit={form.onSubmit(handleCreateUser)}>
         <Stack gap="xs">
           <Title order={2} ta="center" size="md">
-            Create User
+            Benutzer erstellen
           </Title>
 
-          <Divider label="Personal Info" labelPosition="center" />
+          <Divider label="Persönliche Informationen" labelPosition="center" />
 
           <Group grow>
-            <TextInput size="xs" label="Title" placeholder="e.g. Mr, Ms, Dr" {...form.getInputProps("title")} />
-            <TextInput size="xs" label="First Name" placeholder="John" {...form.getInputProps("first_name")} required />
-            <TextInput size="xs" label="Last Name" placeholder="Doe" {...form.getInputProps("last_name")} required />
+            <TextInput size="xs" label="Titel" placeholder="z.B. Herr, Frau, Dr." {...form.getInputProps("title")} />
+            <TextInput size="xs" label="Vorname" placeholder="Max" {...form.getInputProps("first_name")} required />
+            <TextInput size="xs" label="Nachname" placeholder="Mustermann" {...form.getInputProps("last_name")} required />
           </Group>
 
-          <TextInput size="xs" label="Email" placeholder="example@mail.com" type="email" {...form.getInputProps("email")} required />
+          <TextInput size="xs" label="E-Mail" placeholder="beispiel@mail.de" type="email" {...form.getInputProps("email")} required />
 
           <Divider label="Details" labelPosition="center" />
 
           <Group grow>
-            <ColorInput size="xs" label="Favorite Color" {...form.getInputProps("color")} />
+            <ColorInput size="xs" label="Lieblingsfarbe" {...form.getInputProps("color")} />
             <Select
               size="xs"
-              label="Gender"
-              placeholder="Select gender"
+              label="Geschlecht"
+              placeholder="Geschlecht auswählen"
               data={[
-                { value: "male", label: "Male" },
-                { value: "female", label: "Female" },
-                { value: "other", label: "Other" },
+                { value: "male", label: "Männlich" },
+                { value: "female", label: "Weiblich" },
+                { value: "other", label: "Andere" },
               ]}
               {...form.getInputProps("gender")}
               clearable
             />
-            <TextInput size="xs" label="Job" placeholder="Software Engineer" {...form.getInputProps("job")} />
+            <TextInput size="xs" label="Beruf" placeholder="Softwareentwickler" {...form.getInputProps("job")} />
           </Group>
 
-          <Switch size="xs" label="Has Personal Calendar" {...form.getInputProps("has_personal_calendar", { type: "checkbox" })} />
+          <Switch size="xs" label="Persönlicher Kalender aktiviert" {...form.getInputProps("has_personal_calendar", { type: "checkbox" })} />
 
           <MultiSelect
             size="xs"
-            label="Roles"
-            placeholder="Select Roles"
+            label="Rollen zuweisen"
+            placeholder="Rollen auswählen"
             data={roles.map((role) => ({ value: String(role.id), label: role.name || "" }))}
             {...form.getInputProps("roles")}
             searchable
             clearable
           />
 
-          {/* Login access */}
-          <Switch size="xs" label="Allow Login Access" checked={loginAccess} onChange={(event) => setLoginAccess(event.currentTarget.checked)} />
+          <Switch size="xs" label="Login-Zugriff erlauben" checked={loginAccess} onChange={(event) => setLoginAccess(event.currentTarget.checked)} />
 
           <Collapse in={loginAccess}>
             <Stack gap="xs" mt="xs">
-              <PasswordInput size="xs" placeholder="Password" {...form.getInputProps("password")} required={loginAccess} />
-              <PasswordInput size="xs" placeholder="Confirm Password" {...form.getInputProps("confirm_password")} required={loginAccess} />
-              {/* Compact password rules */}
+              <PasswordInput size="xs" placeholder="Passwort" {...form.getInputProps("password")} required={loginAccess} />
+              <PasswordInput size="xs" placeholder="Passwort bestätigen" {...form.getInputProps("confirm_password")} required={loginAccess} />
               <List size="xs" type="unordered" style={{ listStyleType: "disc" }}>
                 <List.Item>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-                    {hasMinLength ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} Minimum 12 characters
+                    {hasMinLength ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} Mindestens 12 Zeichen
                   </span>
                 </List.Item>
                 <List.Item>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-                    {hasUppercase ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} One uppercase character
+                    {hasUppercase ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} Ein Großbuchstabe
                   </span>
                 </List.Item>
                 <List.Item>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-                    {hasLowercase ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} One lowercase character
+                    {hasLowercase ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} Ein Kleinbuchstabe
                   </span>
                 </List.Item>
                 <List.Item>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-                    {hasNumber ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} One number
+                    {hasNumber ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} Eine Zahl
                   </span>
                 </List.Item>
                 <List.Item>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-                    {hasSpecialChar ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} One special character
+                    {hasSpecialChar ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} Ein Sonderzeichen
                   </span>
                 </List.Item>
                 <List.Item>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-                    {passwordsMatch ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} Passwords match
+                    {passwordsMatch ? <FaCheckCircle color="green" /> : <IoMdCloseCircle color="red" />} Passwörter stimmen überein
                   </span>
                 </List.Item>
               </List>
@@ -196,10 +193,10 @@ export default function CreateUserForm({ closeModal }: CreateUserFormProps) {
 
           <Group mt="xs" justify="right">
             <Button size="xs" variant="default" onClick={closeModal}>
-              Cancel
+              Abbrechen
             </Button>
             <Button size="xs" type="submit">
-              Save Changes
+              Speichern
             </Button>
           </Group>
         </Stack>

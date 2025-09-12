@@ -8,9 +8,8 @@ type Props = {
   title: string;
   buttonTitle: string;
   deleteText: string;
-  onConfirm: () => void; // <-- instead of handleDeleteAction(id:number)
+  onConfirm: () => void;
   isButton: boolean;
-
 };
 
 function DeleteButton({ size, title, buttonTitle, deleteText, onConfirm, isButton }: Props) {
@@ -18,19 +17,25 @@ function DeleteButton({ size, title, buttonTitle, deleteText, onConfirm, isButto
     modals.openConfirmModal({
       title,
       centered: true,
-
       children: <Text size="sm">{deleteText}</Text>,
-      labels: { confirm: buttonTitle, cancel: "No don't delete it" },
+      labels: { 
+        confirm: buttonTitle || "Löschen", 
+        cancel: "Abbrechen" 
+      },
       confirmProps: { color: "red" },
-      onCancel: () => console.log("Cancel"),
+      onCancel: () => console.log("Abgebrochen"),
       onConfirm,
-
     });
 
   return isButton ? (
-    <Button size={size} variant="outline" onClick={openDeleteModal} color="red" onPointerDown={(e) => e.stopPropagation()}
->
-      Delete
+    <Button 
+      size={size} 
+      variant="outline" 
+      onClick={openDeleteModal} 
+      color="red" 
+      onPointerDown={(e) => e.stopPropagation()}
+    >
+      {buttonTitle || "Löschen"}
     </Button>
   ) : (
     <ActionIcon variant="light" color="red">

@@ -77,7 +77,7 @@ export default function EditEventForm({ eventId, closeModal }: Props) {
       ).unwrap();
       closeModal();
     } catch (error) {
-      console.error("Failed to update event", error);
+      console.error("Fehler beim Aktualisieren des Termins", error);
     }
   };
 
@@ -86,30 +86,30 @@ export default function EditEventForm({ eventId, closeModal }: Props) {
       <form onSubmit={form.onSubmit(handleEditEvent)}>
         <Stack gap="sm">
           <Title order={4} ta="center" mb="xs">
-            Edit Event
+            Termin bearbeiten
           </Title>
 
-          <Divider label="Event Info" labelPosition="center" my="xs" />
+          <Divider label="Termin Informationen" labelPosition="center" my="xs" />
 
           <TextInput
-            label="Event Name"
-            placeholder="Enter Event Name"
+            label="Terminname"
+            placeholder="Geben Sie den Terminname ein"
             withAsterisk
             size="xs"
             {...form.getInputProps("event_name")}
           />
 
           <ColorInput
-            label="Event Color"
-            placeholder="Select color"
+            label="Farbe"
+            placeholder="Farbe auswählen"
             size="xs"
             {...form.getInputProps("event_color")}
             required
           />
 
           <MultiSelect
-            label="Helpers"
-            placeholder="Select helpers"
+            label="Hilfspersonen"
+            placeholder="Hilfspersonen auswählen"
             size="xs"
             data={users.map((u) => ({
               value: String(u.id),
@@ -120,13 +120,13 @@ export default function EditEventForm({ eventId, closeModal }: Props) {
             clearable
           />
 
-          <Divider label="Schedule" labelPosition="center" my="xs" />
+          <Divider label="Zeitplan" labelPosition="center" my="xs" />
 
           <Group grow gap="xs">
             <DateTimePicker
-              label="Start Date"
-              placeholder="Select start"
-              valueFormat="DD-MM-YYYY, HH:mm"
+              label="Startdatum"
+              placeholder="Start auswählen"
+              valueFormat="DD.MM.YYYY, HH:mm"
               size="xs"
               {...form.getInputProps("event_start")}
               timePickerProps={{
@@ -137,9 +137,9 @@ export default function EditEventForm({ eventId, closeModal }: Props) {
               }}
             />
             <DateTimePicker
-              label="End Date"
-              placeholder="Select end"
-              valueFormat="DD-MM-YYYY, HH:mm"
+              label="Enddatum"
+              placeholder="Ende auswählen"
+              valueFormat="DD.MM.YYYY, HH:mm"
               size="xs"
               {...form.getInputProps("event_end")}
               timePickerProps={{
@@ -152,8 +152,8 @@ export default function EditEventForm({ eventId, closeModal }: Props) {
           </Group>
 
           <TextInput
-            label="Location"
-            placeholder="Event location"
+            label="Ort"
+            placeholder="Ort des Termins"
             size="xs"
             {...form.getInputProps("event_location")}
           />
@@ -163,13 +163,13 @@ export default function EditEventForm({ eventId, closeModal }: Props) {
             onChange={(content) =>
               form.setFieldValue("event_description", content)
             }
-            height={150} // optional, adjust as needed
-            placeholder="Enter event description"
+            height={150}
+            placeholder="Beschreibung eingeben..."
           />
 
           <Textarea
-            label="Notes"
-            placeholder="Additional notes"
+            label="Notizen"
+            placeholder="Zusätzliche Notizen"
             size="xs"
             autosize
             minRows={2}
@@ -178,10 +178,10 @@ export default function EditEventForm({ eventId, closeModal }: Props) {
 
           <Group mt="sm" gap="xs" justify="right">
             <Button size="xs" variant="default" onClick={closeModal}>
-              Cancel
+              Abbrechen
             </Button>
             <Button size="xs" type="submit">
-              Update Event
+              Termin aktualisieren
             </Button>
           </Group>
         </Stack>
